@@ -61,15 +61,15 @@ function RoomDetection.start()
         local playerPosition = humanoidRootPart.Position
         local detectedRoom = detectRoom(playerPosition)
 
-        -- Only print when room changes
-        if detectedRoom ~= currentRoom then
-            currentRoom = detectedRoom
-            if currentRoom then
-                print("[RoomDetection] Player entered:", currentRoom)
-            else
-                print("[RoomDetection] Player left all rooms")
-            end
-        end
+        -- -- Only print when room changes
+        -- if detectedRoom ~= currentRoom then
+        --     currentRoom = detectedRoom
+        --     if currentRoom then
+        --         -- print("[RoomDetection] Player entered:", currentRoom)
+        --     else
+        --         -- print("[RoomDetection] Player left all rooms")
+        --     end
+        -- end
     end)
 
     -- Handle character respawns
