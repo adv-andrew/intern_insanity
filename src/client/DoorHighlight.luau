@@ -4,13 +4,20 @@
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RoomDetection = require(script.Parent.RoomDetection)
 
 local DoorHighlight = {}
 
+local player = Players.LocalPlayer
+
 -- Get doors folder
 local Doors = Workspace:WaitForChild("Doors")
+
+-- Get ArrowBeam template
+local Assets = ReplicatedStorage:WaitForChild("Assets")
+local ArrowBeamTemplate = Assets:WaitForChild("ArrowBeam")
 
 -- Mapping of current room + target room to door name
 local doorRoutes = {
@@ -31,6 +38,26 @@ local doorRoutes = {
 }
 
 local currentHighlight = nil
+local currentArrowBeam = nil
+local playerAttachment = nil
+local doorAttachment = nil
+local currentHighlightedDoor = nil -- Track which door is currently highlighted
+
+-- Remove existing arrow beam
+local function removeArrowBeam()
+    if currentArrowBeam then
+        currentArrowBeam:Destroy()
+        currentArrowBeam = nil
+    end
+    if playerAttachment then
+        playerAttachment:Destroy()
+        playerAttachment = nil
+    end
+    if doorAttachment then
+        doorAttachment:Destroy()
+        doorAttachment = nil
+    end
+end
 
 -- Remove existing highlight
 local function removeHighlight()
@@ -38,10 +65,17 @@ local function removeHighlight()
         currentHighlight:Destroy()
         currentHighlight = nil
     end
+    removeArrowBeam()
+    currentHighlightedDoor = nil
 end
 
 -- Add highlight to a door
 local function highlightDoor(doorName: string)
+    -- Check if this door is already highlighted
+    if currentHighlightedDoor == doorName then
+        return -- Don't recreate, just keep existing highlight
+    end
+
     removeHighlight()
 
     local door = Doors:FindFirstChild(doorName)
@@ -59,6 +93,38 @@ local function highlightDoor(doorName: string)
     highlight.Parent = door
 
     currentHighlight = highlight
+
+    -- Create ArrowBeam from player to door
+    local character = player.Character
+    if not character then
+        return
+    end
+
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then
+        return
+    end
+
+    -- Create attachment in player's HumanoidRootPart
+    local playerAttach = Instance.new("Attachment")
+    playerAttach.Name = "ArrowBeamStart"
+    playerAttach.Parent = humanoidRootPart
+    playerAttachment = playerAttach
+
+    -- Create attachment in door
+    local doorAttach = Instance.new("Attachment")
+    doorAttach.Name = "ArrowBeamEnd"
+    doorAttach.Parent = door
+    doorAttachment = doorAttach
+
+    -- Clone ArrowBeam
+    local arrowBeam = ArrowBeamTemplate:Clone()
+    arrowBeam.Attachment0 = playerAttach
+    arrowBeam.Attachment1 = doorAttach
+    arrowBeam.Parent = humanoidRootPart
+
+    currentArrowBeam = arrowBeam
+    currentHighlightedDoor = doorName
 end
 
 -- Update door highlight based on current room and target room
