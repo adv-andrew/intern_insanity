@@ -15,9 +15,10 @@ local player = Players.LocalPlayer
 -- Get doors folder
 local Doors = Workspace:WaitForChild("Doors")
 
--- Get ArrowBeam template
+-- Get ArrowBeam template and ProximityPrompt
 local Assets = ReplicatedStorage:WaitForChild("Assets")
 local ArrowBeamTemplate = Assets:WaitForChild("ArrowBeam")
+local ProximityPromptTemplate = Assets:WaitForChild("ProximityPrompt")
 
 -- Mapping of current room + target room to door name
 local doorRoutes = {
@@ -43,6 +44,7 @@ local playerAttachment = nil
 local targetAttachment = nil
 local currentHighlightedDoor = nil -- Track which door is currently highlighted
 local currentHighlightedObject = nil -- Track which object is currently highlighted
+local currentProximityPrompt = nil -- Track current proximity prompt
 
 -- Remove existing arrow beam
 local function removeArrowBeam()
@@ -60,6 +62,14 @@ local function removeArrowBeam()
     end
 end
 
+-- Remove existing proximity prompt
+local function removeProximityPrompt()
+    if currentProximityPrompt then
+        currentProximityPrompt:Destroy()
+        currentProximityPrompt = nil
+    end
+end
+
 -- Remove existing highlight
 local function removeHighlight()
     if currentHighlight then
@@ -67,6 +77,7 @@ local function removeHighlight()
         currentHighlight = nil
     end
     removeArrowBeam()
+    removeProximityPrompt()
     currentHighlightedDoor = nil
     currentHighlightedObject = nil
 end
@@ -189,6 +200,35 @@ local function highlightObject(objectPath: string)
 
     currentArrowBeam = arrowBeam
     currentHighlightedObject = objectPath
+
+    -- Add ProximityPrompt to the object
+    -- ProximityPrompt must be parented to a BasePart or MeshPart
+    local targetPart = nil
+    if objectModel:IsA("BasePart") or objectModel:IsA("MeshPart") then
+        targetPart = objectModel
+    else
+        -- Find first BasePart/MeshPart child in the model
+        for _, child in ipairs(objectModel:GetDescendants()) do
+            if child:IsA("BasePart") or child:IsA("MeshPart") then
+                targetPart = child
+                break
+            end
+        end
+    end
+
+    if targetPart then
+        local proximityPrompt = ProximityPromptTemplate:Clone()
+        proximityPrompt.Parent = targetPart
+        currentProximityPrompt = proximityPrompt
+
+        -- Connect to proximity prompt triggered event (for future use)
+        proximityPrompt.Triggered:Connect(function(playerWhoTriggered)
+            print("[DoorHighlight] Player interacted with:", objectPath)
+            -- TODO: Handle objective completion
+        end)
+    else
+        warn("[DoorHighlight] No BasePart/MeshPart found in object:", objectPath)
+    end
 end
 
 -- Update door highlight based on current room, target room, and optional object
