@@ -127,6 +127,24 @@ TaskRegistry.Tasks = {
         timeToComplete = 35,
         category = "TechTasks",
     } :: Task,
+
+    AWSOutage = {
+        id = "AWSOutage",
+        name = "AWS Outage: Servers on Fire",
+        description = "The servers are down! Fix it before anyone notices",
+        emoji = "🔥",
+        timeToComplete = 45,
+        category = "TechTasks",
+    } :: Task,
+
+    FixBugQuiz = {
+        id = "FixBugQuiz",
+        name = "Fix Bug Quiz",
+        description = "Debug this code and prove your coding skills",
+        emoji = "🐛",
+        timeToComplete = 50,
+        category = "TechTasks",
+    } :: Task,
 }
 
 -- Get all tasks as an array
@@ -161,6 +179,11 @@ function TaskRegistry.getRandomTaskByCategory(category: TaskCategory): Task
     local categoryTasks = TaskRegistry.getTasksByCategory(category)
     local randomIndex = math.random(1, #categoryTasks)
     return categoryTasks[randomIndex]
+end
+
+-- Get a task by ID
+function TaskRegistry.getTaskById(taskId: string): Task?
+    return TaskRegistry.Tasks[taskId]
 end
 
 return TaskRegistry

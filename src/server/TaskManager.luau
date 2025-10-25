@@ -12,47 +12,41 @@ local TaskManager = {}
 
 -- Configuration
 local TASK_SPAWN_INTERVAL = 5 -- seconds between task spawns
-local MAX_TASKS = 4 -- total number of tasks to spawn
+
+-- Level 1 hardcoded task sequence
+local LEVEL_1_TASKS = {
+    "PrinterJam",
+    "AWSOutage",
+    "CoworkerConflict",
+    "FixBugQuiz",
+}
 
 local taskCount = 0
-local availableCategories = { "OfficeMovement", "MentalBreaks", "SocialTasks", "TechTasks" }
-local shuffledCategories = {}
-
--- Shuffle the categories array for this game session
-local function shuffleCategories()
-    shuffledCategories = {}
-    local tempCategories = { unpack(availableCategories) }
-
-    while #tempCategories > 0 do
-        local randomIndex = math.random(1, #tempCategories)
-        table.insert(shuffledCategories, tempCategories[randomIndex])
-        table.remove(tempCategories, randomIndex)
-    end
-end
 
 -- Spawns a task and sends it to all clients
 local function spawnTask()
     taskCount = taskCount + 1
 
-    -- Get the category for this task (ensuring no duplicates)
-    local category = shuffledCategories[taskCount]
+    -- Get the task ID for this level
+    local taskId = LEVEL_1_TASKS[taskCount]
 
-    -- Select a random task from that category
-    local selectedTask = TaskRegistry.getRandomTaskByCategory(category)
+    -- Get the task from registry
+    local selectedTask = TaskRegistry.getTaskById(taskId)
 
-    -- Fire to all clients with task data
-    RemoteEvents.SpawnTask:FireAllClients(selectedTask)
+    if selectedTask then
+        -- Fire to all clients with task data
+        RemoteEvents.SpawnTask:FireAllClients(selectedTask)
+    else
+        warn("[Server] Task not found:", taskId)
+    end
 end
 
 function TaskManager.start()
-    -- Shuffle categories to ensure no duplicates
-    shuffleCategories()
-
     -- Spawn first task immediately
     spawnTask()
 
-    -- Spawn remaining 3 tasks with 5-second intervals
-    for i = 2, MAX_TASKS do
+    -- Spawn remaining tasks with 5-second intervals
+    for i = 2, #LEVEL_1_TASKS do
         task.wait(TASK_SPAWN_INTERVAL)
         spawnTask()
     end
