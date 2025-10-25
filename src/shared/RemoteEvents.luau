@@ -23,4 +23,19 @@ end
 
 RemoteEvents.SpawnTask = spawnTaskEvent
 
+-- Find or create RemoteEvent for player ready signal
+local playerReadyEvent = ReplicatedStorage:FindFirstChild("PlayerReadyEvent")
+
+if not playerReadyEvent then
+    if RunService:IsServer() then
+        playerReadyEvent = Instance.new("RemoteEvent")
+        playerReadyEvent.Name = "PlayerReadyEvent"
+        playerReadyEvent.Parent = ReplicatedStorage
+    else
+        playerReadyEvent = ReplicatedStorage:WaitForChild("PlayerReadyEvent", 10)
+    end
+end
+
+RemoteEvents.PlayerReady = playerReadyEvent
+
 return RemoteEvents
