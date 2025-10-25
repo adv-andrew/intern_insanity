@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CameraController = require(script.CameraController)
 local TaskManager = require(script.TaskManager)
 local FadeController = require(script.FadeController)
+local RoomDetection = require(script.RoomDetection)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -20,6 +21,9 @@ startScreen.Enabled = true
 
 -- Start the fade controller (listens for teleport events)
 FadeController.start()
+
+-- Start room detection
+RoomDetection.start()
 
 -- Wait for player to click Start button
 startButton.Activated:Connect(function()
