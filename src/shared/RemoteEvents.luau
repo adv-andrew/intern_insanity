@@ -15,14 +15,10 @@ if not spawnTaskEvent then
         spawnTaskEvent = Instance.new("RemoteEvent")
         spawnTaskEvent.Name = "SpawnTaskEvent"
         spawnTaskEvent.Parent = ReplicatedStorage
-        print("[RemoteEvents] Created SpawnTaskEvent on server")
     else
         -- Client waits for server to create it
         spawnTaskEvent = ReplicatedStorage:WaitForChild("SpawnTaskEvent", 10)
-        print("[RemoteEvents] Found SpawnTaskEvent on client")
     end
-else
-    print("[RemoteEvents] Found existing SpawnTaskEvent")
 end
 
 RemoteEvents.SpawnTask = spawnTaskEvent

@@ -23,26 +23,11 @@ local function spawnTask()
     -- Select a random task from the registry
     local selectedTask = TaskRegistry.getRandomTask()
 
-    print(
-        string.format(
-            "[Server] Spawning task %d/%d: %s (%s)",
-            taskCount,
-            MAX_TASKS,
-            selectedTask.name,
-            selectedTask.category
-        )
-    )
-    print("[Server] Task data:", selectedTask.id, selectedTask.emoji, selectedTask.description)
-    print("[Server] RemoteEvent reference:", RemoteEvents.SpawnTask)
-
     -- Fire to all clients with task data
     RemoteEvents.SpawnTask:FireAllClients(selectedTask)
-    print("[Server] ✓ Fired RemoteEvent to all clients")
 end
 
 function TaskManager.start()
-    print("[Server] TaskManager starting - will spawn 4 tasks at 30-second intervals")
-
     -- Spawn first task immediately
     spawnTask()
 
@@ -51,13 +36,6 @@ function TaskManager.start()
         task.wait(TASK_SPAWN_INTERVAL)
         spawnTask()
     end
-
-    print(
-        string.format(
-            "[Server] All %d tasks have been spawned. TaskManager complete.",
-            MAX_TASKS
-        )
-    )
 end
 
 return TaskManager
