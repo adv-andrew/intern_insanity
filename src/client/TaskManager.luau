@@ -12,6 +12,13 @@ local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
 local TaskManager = {}
 
 local currentTaskCount = 0
+local selectedTask = nil -- Track currently selected task
+local allTaskFrames = {} -- Store all task frames for unselecting
+
+-- Colors
+local SELECTED_COLOR = Color3.fromRGB(52, 152, 219) -- Blue
+local DEFAULT_TASK_COLOR = Color3.fromRGB(255, 255, 255) -- Default dark gray
+local DEFAULT_ICON_COLOR = Color3.fromRGB(255, 255, 255) -- Default icon background
 
 -- Spawn and populate a task frame with server-provided task data
 local function spawnTask(taskData: TaskRegistry.Task)
@@ -51,6 +58,32 @@ local function spawnTask(taskData: TaskRegistry.Task)
 
     -- Parent to the Tasks container
     newTask.Parent = tasksContainer
+
+    -- Store task frame reference
+    table.insert(allTaskFrames, newTask)
+
+    -- Setup selection button
+    local selectButton = newTask:FindFirstChild("SelectButton")
+    if selectButton then
+        selectButton.Activated:Connect(function()
+            -- Unselect all tasks
+            for _, taskFrame in ipairs(allTaskFrames) do
+                taskFrame.BackgroundColor3 = DEFAULT_TASK_COLOR
+                local taskIcon = taskFrame:FindFirstChild("Icon")
+                if taskIcon then
+                    taskIcon.BackgroundColor3 = DEFAULT_ICON_COLOR
+                end
+            end
+
+            -- Select this task
+            newTask.BackgroundColor3 = SELECTED_COLOR
+            if icon then
+                icon.BackgroundColor3 = SELECTED_COLOR
+            end
+
+            selectedTask = newTask
+        end)
+    end
 
     -- Start the timer for this task
     local timeRemaining = taskData.timeToComplete
@@ -104,6 +137,11 @@ function TaskManager.start()
     RemoteEvents.SpawnTask.OnClientEvent:Connect(function(taskData: TaskRegistry.Task)
         spawnTask(taskData)
     end)
+end
+
+-- Get the currently selected task frame
+function TaskManager.getSelectedTask()
+    return selectedTask
 end
 
 return TaskManager
