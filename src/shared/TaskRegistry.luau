@@ -6,6 +6,7 @@ export type TaskCategory = "OfficeMovement" | "MentalBreaks" | "SocialTasks" | "
 export type TaskObjective = {
     description: string,
     room: string, -- Room where objective must be completed
+    objectModel: string?, -- Optional: Workspace path to the objective model (e.g., "Office.Printer")
 }
 
 export type Task = {
@@ -123,8 +124,16 @@ TaskRegistry.Tasks = {
         timeToComplete = 40,
         category = "OfficeMovement",
         objectives = {
-            { description = "Get paper from Conference room", room = "Conference" },
-            { description = "Deliver paper to Office printer", room = "Office" },
+            {
+                description = "Get paper from Conference room",
+                room = "Conference",
+                objectModel = "Conference.PaperStack",
+            },
+            {
+                description = "Deliver paper to Office printer",
+                room = "Office",
+                objectModel = "Office.Printer",
+            },
         },
     } :: Task,
 

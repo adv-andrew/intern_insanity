@@ -1,5 +1,5 @@
 -- Client/DoorHighlight.luau
--- Highlights doors based on selected task objectives and current room
+-- Highlights doors and objectives based on selected task objectives and current room
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
@@ -40,8 +40,9 @@ local doorRoutes = {
 local currentHighlight = nil
 local currentArrowBeam = nil
 local playerAttachment = nil
-local doorAttachment = nil
+local targetAttachment = nil
 local currentHighlightedDoor = nil -- Track which door is currently highlighted
+local currentHighlightedObject = nil -- Track which object is currently highlighted
 
 -- Remove existing arrow beam
 local function removeArrowBeam()
@@ -53,9 +54,9 @@ local function removeArrowBeam()
         playerAttachment:Destroy()
         playerAttachment = nil
     end
-    if doorAttachment then
-        doorAttachment:Destroy()
-        doorAttachment = nil
+    if targetAttachment then
+        targetAttachment:Destroy()
+        targetAttachment = nil
     end
 end
 
@@ -67,6 +68,7 @@ local function removeHighlight()
     end
     removeArrowBeam()
     currentHighlightedDoor = nil
+    currentHighlightedObject = nil
 end
 
 -- Add highlight to a door
@@ -112,23 +114,85 @@ local function highlightDoor(doorName: string)
     playerAttachment = playerAttach
 
     -- Create attachment in door
-    local doorAttach = Instance.new("Attachment")
-    doorAttach.Name = "ArrowBeamEnd"
-    doorAttach.Parent = door
-    doorAttachment = doorAttach
+    local targetAttach = Instance.new("Attachment")
+    targetAttach.Name = "ArrowBeamEnd"
+    targetAttach.Parent = door
+    targetAttachment = targetAttach
 
     -- Clone ArrowBeam
     local arrowBeam = ArrowBeamTemplate:Clone()
     arrowBeam.Attachment0 = playerAttach
-    arrowBeam.Attachment1 = doorAttach
+    arrowBeam.Attachment1 = targetAttach
     arrowBeam.Parent = humanoidRootPart
 
     currentArrowBeam = arrowBeam
     currentHighlightedDoor = doorName
 end
 
--- Update door highlight based on current room and target room
-function DoorHighlight.updateHighlight(targetRoom: string)
+-- Add highlight to an objective object in the room
+local function highlightObject(objectPath: string)
+    -- Check if this object is already highlighted
+    if currentHighlightedObject == objectPath then
+        return -- Don't recreate, just keep existing highlight
+    end
+
+    removeHighlight()
+
+    -- Find the object in Workspace
+    local objectModel = Workspace
+    for _, pathSegment in ipairs(string.split(objectPath, ".")) do
+        objectModel = objectModel:FindFirstChild(pathSegment)
+        if not objectModel then
+            warn("[DoorHighlight] Object not found:", objectPath)
+            return
+        end
+    end
+
+    -- Create Highlight instance
+    local highlight = Instance.new("Highlight")
+    highlight.FillColor = Color3.fromRGB(255, 255, 0) -- Yellow
+    highlight.OutlineColor = Color3.fromRGB(255, 200, 0) -- Orange-yellow
+    highlight.FillTransparency = 0.5
+    highlight.OutlineTransparency = 0
+    highlight.Parent = objectModel
+
+    currentHighlight = highlight
+
+    -- Create ArrowBeam from player to object
+    local character = player.Character
+    if not character then
+        return
+    end
+
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then
+        return
+    end
+
+    -- Create attachment in player's HumanoidRootPart
+    local playerAttach = Instance.new("Attachment")
+    playerAttach.Name = "ArrowBeamStart"
+    playerAttach.Parent = humanoidRootPart
+    playerAttachment = playerAttach
+
+    -- Create attachment in object
+    local targetAttach = Instance.new("Attachment")
+    targetAttach.Name = "ArrowBeamEnd"
+    targetAttach.Parent = objectModel
+    targetAttachment = targetAttach
+
+    -- Clone ArrowBeam
+    local arrowBeam = ArrowBeamTemplate:Clone()
+    arrowBeam.Attachment0 = playerAttach
+    arrowBeam.Attachment1 = targetAttach
+    arrowBeam.Parent = humanoidRootPart
+
+    currentArrowBeam = arrowBeam
+    currentHighlightedObject = objectPath
+end
+
+-- Update door highlight based on current room, target room, and optional object
+function DoorHighlight.updateHighlight(targetRoom: string, objectPath: string?)
     local currentRoom = RoomDetection.getCurrentRoom()
 
     -- If not in a room, remove highlight
@@ -137,9 +201,13 @@ function DoorHighlight.updateHighlight(targetRoom: string)
         return
     end
 
-    -- If already in target room, remove highlight
+    -- If already in target room and there's an object, highlight the object
     if currentRoom == targetRoom then
-        removeHighlight()
+        if objectPath then
+            highlightObject(objectPath)
+        else
+            removeHighlight()
+        end
         return
     end
 

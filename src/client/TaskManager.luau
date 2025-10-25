@@ -51,7 +51,7 @@ local function autoSelectTask(taskFrame, taskData)
     -- Update door highlighting based on first objective
     if taskData.objectives and #taskData.objectives > 0 then
         local firstObjective = taskData.objectives[1]
-        DoorHighlight.updateHighlight(firstObjective.room)
+        DoorHighlight.updateHighlight(firstObjective.room, firstObjective.objectModel)
     else
         DoorHighlight.clear()
     end
@@ -170,7 +170,7 @@ function TaskManager.start()
     RunService.Heartbeat:Connect(function()
         if selectedTaskData and selectedTaskData.objectives and #selectedTaskData.objectives > 0 then
             local firstObjective = selectedTaskData.objectives[1]
-            DoorHighlight.updateHighlight(firstObjective.room)
+            DoorHighlight.updateHighlight(firstObjective.room, firstObjective.objectModel)
         end
     end)
 end
