@@ -1,0 +1,30 @@
+{
+    "$className": "ScreenGui",
+    "$properties": {
+        "Name": "MainGui",
+        "ResetOnSpawn": false,
+        "ZIndexBehavior": "Sibling"
+    },
+    "Tasks": {
+        "$className": "Frame",
+        "$properties": {
+            "Size": {
+                "X": { "Scale": 0, "Offset": 300 },
+                "Y": { "Scale": 0.8, "Offset": 0 }
+            },
+            "Position": {
+                "X": { "Scale": 0, "Offset": 20 },
+                "Y": { "Scale": 0.1, "Offset": 0 }
+            },
+            "BackgroundTransparency": 1,
+            "BorderSizePixel": 0
+        },
+        "UIListLayout": {
+            "$className": "UIListLayout",
+            "$properties": {
+                "SortOrder": "LayoutOrder",
+                "Padding": { "Scale": 0, "Offset": 10 }
+            }
+        }
+    }
+}

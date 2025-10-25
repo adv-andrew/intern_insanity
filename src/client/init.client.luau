@@ -2,6 +2,7 @@
 -- Client initialization script
 
 local CameraController = require(script.CameraController)
+local TaskManager = require(script.TaskManager)
 
 print("Client initializing...")
 
@@ -9,3 +10,8 @@ print("Client initializing...")
 CameraController.start()
 
 print("Top-down camera enabled!")
+
+-- Start the task system (spawns tasks every 30 seconds)
+task.spawn(function()
+    TaskManager.start()
+end)

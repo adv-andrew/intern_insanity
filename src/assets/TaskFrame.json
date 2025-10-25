@@ -1,0 +1,62 @@
+{
+    "$className": "Frame",
+    "$properties": {
+        "Size": {
+            "X": { "Scale": 1, "Offset": -10 },
+            "Y": { "Scale": 0, "Offset": 80 }
+        },
+        "BackgroundColor3": [0.2, 0.2, 0.25],
+        "BorderSizePixel": 0
+    },
+    "UICorner": {
+        "$className": "UICorner",
+        "$properties": {
+            "CornerRadius": { "Scale": 0, "Offset": 8 }
+        }
+    },
+    "UIStroke": {
+        "$className": "UIStroke",
+        "$properties": {
+            "Color": [0.4, 0.4, 0.45],
+            "Thickness": 2
+        }
+    },
+    "TaskTitle": {
+        "$className": "TextLabel",
+        "$properties": {
+            "Size": {
+                "X": { "Scale": 1, "Offset": -20 },
+                "Y": { "Scale": 0, "Offset": 30 }
+            },
+            "Position": {
+                "X": { "Scale": 0, "Offset": 10 },
+                "Y": { "Scale": 0, "Offset": 10 }
+            },
+            "BackgroundTransparency": 1,
+            "Text": "New Task",
+            "TextColor3": [1, 1, 1],
+            "TextSize": 18,
+            "Font": "GothamBold",
+            "TextXAlignment": "Left"
+        }
+    },
+    "TaskDescription": {
+        "$className": "TextLabel",
+        "$properties": {
+            "Size": {
+                "X": { "Scale": 1, "Offset": -20 },
+                "Y": { "Scale": 0, "Offset": 30 }
+            },
+            "Position": {
+                "X": { "Scale": 0, "Offset": 10 },
+                "Y": { "Scale": 0, "Offset": 45 }
+            },
+            "BackgroundTransparency": 1,
+            "Text": "Task details will go here",
+            "TextColor3": [0.7, 0.7, 0.7],
+            "TextSize": 14,
+            "Font": "Gotham",
+            "TextXAlignment": "Left"
+        }
+    }
+}
