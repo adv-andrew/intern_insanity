@@ -32,23 +32,70 @@ local function spawnTask(taskData: TaskRegistry.Task)
     newTask.Name = "Task_" .. currentTaskCount
 
     -- Populate task frame with data
-    local titleLabel = newTask:FindFirstChild("TaskTitle") :: TextLabel
-    local descLabel = newTask:FindFirstChild("TaskDescription") :: TextLabel
+    local container = newTask:FindFirstChild("Container")
+    local icon = newTask:FindFirstChild("Icon")
 
-    if titleLabel then
-        titleLabel.Text = string.format("%s %s", taskData.emoji, taskData.name)
+    if container then
+        local descLabel = container:FindFirstChild("TextLabel") :: TextLabel
+        if descLabel then
+            descLabel.Text = taskData.description
+        end
     end
 
-    if descLabel then
-        descLabel.Text = string.format(
-            "%s - %ds",
-            taskData.description,
-            taskData.timeToComplete
-        )
+    if icon then
+        local emojiLabel = icon:FindFirstChild("Emoji") :: TextLabel
+        if emojiLabel then
+            emojiLabel.Text = taskData.emoji
+        end
     end
 
     -- Parent to the Tasks container
     newTask.Parent = tasksContainer
+
+    -- Start the timer for this task
+    local timeRemaining = taskData.timeToComplete
+    local totalTime = taskData.timeToComplete
+
+    task.spawn(function()
+        local timeBar = newTask:FindFirstChild("TimeBar")
+        local bar = timeBar and timeBar:FindFirstChild("Bar") :: Frame
+
+        -- Define colors for the gradient
+        local greenColor = Color3.fromRGB(51, 255, 136) -- Green
+        local yellowColor = Color3.fromRGB(241, 196, 15) -- Yellow
+        local redColor = Color3.fromRGB(231, 76, 60) -- Red
+
+        while timeRemaining > 0 do
+            task.wait(0.1) -- Update every 0.1 seconds
+            timeRemaining = timeRemaining - 0.1
+
+            if bar then
+                -- Update bar size based on time remaining
+                local progress = math.max(0, timeRemaining / totalTime)
+                bar.Size = UDim2.new(progress, 0, 1, 0)
+
+                -- Update bar color based on progress
+                local barColor
+                if progress > 0.5 then
+                    -- Interpolate between green and yellow (100% to 50%)
+                    local t = (progress - 0.5) / 0.5 -- Normalize to 0-1 range
+                    barColor = yellowColor:Lerp(greenColor, t)
+                else
+                    -- Interpolate between red and yellow (50% to 0%)
+                    local t = progress / 0.5 -- Normalize to 0-1 range
+                    barColor = redColor:Lerp(yellowColor, t)
+                end
+
+                bar.BackgroundColor3 = barColor
+            end
+        end
+
+        -- Task time expired
+        if bar then
+            bar.Size = UDim2.new(0, 0, 1, 0)
+            bar.BackgroundColor3 = redColor
+        end
+    end)
 end
 
 -- Start listening for server task spawns

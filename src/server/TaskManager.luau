@@ -15,23 +15,43 @@ local TASK_SPAWN_INTERVAL = 5 -- seconds between task spawns
 local MAX_TASKS = 4 -- total number of tasks to spawn
 
 local taskCount = 0
+local availableCategories = { "OfficeMovement", "MentalBreaks", "SocialTasks", "TechTasks" }
+local shuffledCategories = {}
+
+-- Shuffle the categories array for this game session
+local function shuffleCategories()
+    shuffledCategories = {}
+    local tempCategories = { unpack(availableCategories) }
+
+    while #tempCategories > 0 do
+        local randomIndex = math.random(1, #tempCategories)
+        table.insert(shuffledCategories, tempCategories[randomIndex])
+        table.remove(tempCategories, randomIndex)
+    end
+end
 
 -- Spawns a task and sends it to all clients
 local function spawnTask()
     taskCount = taskCount + 1
 
-    -- Select a random task from the registry
-    local selectedTask = TaskRegistry.getRandomTask()
+    -- Get the category for this task (ensuring no duplicates)
+    local category = shuffledCategories[taskCount]
+
+    -- Select a random task from that category
+    local selectedTask = TaskRegistry.getRandomTaskByCategory(category)
 
     -- Fire to all clients with task data
     RemoteEvents.SpawnTask:FireAllClients(selectedTask)
 end
 
 function TaskManager.start()
+    -- Shuffle categories to ensure no duplicates
+    shuffleCategories()
+
     -- Spawn first task immediately
     spawnTask()
 
-    -- Spawn remaining 3 tasks with 30-second intervals
+    -- Spawn remaining 3 tasks with 5-second intervals
     for i = 2, MAX_TASKS do
         task.wait(TASK_SPAWN_INTERVAL)
         spawnTask()
