@@ -245,10 +245,18 @@ local function highlightObject(objectPath: string)
                         TaskManager.completeObjective()
                     end
                 elseif taskData and taskData.id == "AWSOutage" then
-                    local success = TaskBehaviors.handleAWSOutageInteraction(objectPath, objectiveIndex)
+                    -- Pass a completion callback for when the minigame is finished
+                    local success = TaskBehaviors.handleAWSOutageInteraction(
+                        objectPath,
+                        objectiveIndex,
+                        function()
+                            -- Called when minigame is completed
+                            TaskManager.completeObjective()
+                        end
+                    )
 
                     if success then
-                        -- Complete the objective
+                        -- Complete the objective immediately
                         TaskManager.completeObjective()
                     end
                 end

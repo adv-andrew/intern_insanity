@@ -5,12 +5,17 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
+local ServerTaskMinigame = require(script.Parent.ServerTaskMinigame)
+
 local TaskBehaviors = {}
 
 local player = Players.LocalPlayer
 
 -- PrinterJam task state
 local hasPapers = false
+
+-- AWSOutage task state
+local awsTaskCompletionCallback = nil
 
 -- Handle PrinterJam task interactions
 function TaskBehaviors.handlePrinterJamInteraction(objectPath: string, currentObjectiveIndex: number)
@@ -34,7 +39,7 @@ function TaskBehaviors.handlePrinterJamInteraction(objectPath: string, currentOb
 end
 
 -- Handle AWSOutage task interactions
-function TaskBehaviors.handleAWSOutageInteraction(objectPath: string, currentObjectiveIndex: number)
+function TaskBehaviors.handleAWSOutageInteraction(objectPath: string, currentObjectiveIndex: number, completionCallback)
     if objectPath == "ServerRoom.ServerMain" and currentObjectiveIndex == 1 then
         -- Open the ServerTask GUI
         local playerGui = player:WaitForChild("PlayerGui")
@@ -44,6 +49,19 @@ function TaskBehaviors.handleAWSOutageInteraction(objectPath: string, currentObj
         if serverTask then
             serverTask.Visible = true
             print("[TaskBehaviors] ServerTask GUI opened")
+
+            -- Store the completion callback
+            awsTaskCompletionCallback = completionCallback
+
+            -- Start the minigame with a callback for when it's completed
+            ServerTaskMinigame.start(function()
+                print("[TaskBehaviors] Server minigame completed!")
+                if awsTaskCompletionCallback then
+                    awsTaskCompletionCallback()
+                    awsTaskCompletionCallback = nil
+                end
+            end)
+
             -- Return false because task is not completed yet (player needs to complete the server task)
             return false
         else
