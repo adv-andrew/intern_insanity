@@ -38,4 +38,19 @@ end
 
 RemoteEvents.PlayerReady = playerReadyEvent
 
+-- Find or create RemoteEvent for door teleportation
+local doorTeleportEvent = ReplicatedStorage:FindFirstChild("DoorTeleportEvent")
+
+if not doorTeleportEvent then
+    if RunService:IsServer() then
+        doorTeleportEvent = Instance.new("RemoteEvent")
+        doorTeleportEvent.Name = "DoorTeleportEvent"
+        doorTeleportEvent.Parent = ReplicatedStorage
+    else
+        doorTeleportEvent = ReplicatedStorage:WaitForChild("DoorTeleportEvent", 10)
+    end
+end
+
+RemoteEvents.DoorTeleport = doorTeleportEvent
+
 return RemoteEvents

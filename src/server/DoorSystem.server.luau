@@ -2,9 +2,14 @@
 -- Handles door teleportation between office and rooms
 
 local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Get doors folder
 local Doors = Workspace:WaitForChild("Doors")
+
+-- Wait for shared modules
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
 
 -- Door mappings: when player touches TP of key, teleport to Entrance of value
 local doorMappings = {
@@ -66,6 +71,12 @@ local function setupDoor(doorName: string, destinationName: string)
 
         debounce[player] = true
 
+        -- Signal client to start fade
+        RemoteEvents.DoorTeleport:FireClient(player, entrancePart.CFrame)
+
+        -- Wait for fade in animation (0.5 seconds)
+        task.wait(0.2)
+
         -- Teleport player
         local character = player.Character
         local rootPart = character and character:FindFirstChild("HumanoidRootPart")
@@ -74,8 +85,9 @@ local function setupDoor(doorName: string, destinationName: string)
             rootPart.CFrame = entrancePart.CFrame
         end
 
-        -- Remove debounce after short delay
-        
+        -- Wait for fade out animation to complete
+        task.wait(0.2)
+
         debounce[player] = nil
     end)
 end
