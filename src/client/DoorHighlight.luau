@@ -235,10 +235,17 @@ local function highlightObject(objectPath: string)
             if TaskManager then
                 local taskData = TaskManager.getSelectedTaskData()
                 local objectiveIndex = TaskManager.getCurrentObjectiveIndex()
+                local TaskBehaviors = require(script.Parent.TaskBehaviors)
 
                 if taskData and taskData.id == "PrinterJam" then
-                    local TaskBehaviors = require(script.Parent.TaskBehaviors)
                     local success = TaskBehaviors.handlePrinterJamInteraction(objectPath, objectiveIndex)
+
+                    if success then
+                        -- Complete the objective
+                        TaskManager.completeObjective()
+                    end
+                elseif taskData and taskData.id == "AWSOutage" then
+                    local success = TaskBehaviors.handleAWSOutageInteraction(objectPath, objectiveIndex)
 
                     if success then
                         -- Complete the objective

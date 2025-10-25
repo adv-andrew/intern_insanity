@@ -145,7 +145,11 @@ TaskRegistry.Tasks = {
         timeToComplete = 45,
         category = "TechTasks",
         objectives = {
-            { description = "Go to Server room and reboot servers", room = "Server" },
+            {
+                description = "Go to Server room and reboot servers",
+                room = "Server",
+                objectModel = "ServerRoom.ServerMain",
+            },
         },
     } :: Task,
 

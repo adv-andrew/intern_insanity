@@ -33,6 +33,27 @@ function TaskBehaviors.handlePrinterJamInteraction(objectPath: string, currentOb
     return false
 end
 
+-- Handle AWSOutage task interactions
+function TaskBehaviors.handleAWSOutageInteraction(objectPath: string, currentObjectiveIndex: number)
+    if objectPath == "ServerRoom.ServerMain" and currentObjectiveIndex == 1 then
+        -- Open the ServerTask GUI
+        local playerGui = player:WaitForChild("PlayerGui")
+        local mainGui = playerGui:WaitForChild("MainGui")
+        local serverTask = mainGui:FindFirstChild("ServerTask")
+
+        if serverTask then
+            serverTask.Visible = true
+            print("[TaskBehaviors] ServerTask GUI opened")
+            -- Return false because task is not completed yet (player needs to complete the server task)
+            return false
+        else
+            warn("[TaskBehaviors] ServerTask GUI not found!")
+            return false
+        end
+    end
+    return false
+end
+
 -- Get if player has papers
 function TaskBehaviors.hasPapers(): boolean
     return hasPapers
