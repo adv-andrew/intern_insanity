@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "project": {
+    "name": "Roblox-Rojo-Dev",
+    "description": "AI config for a production-grade Roblox + Rojo project. Prioritizes Luau types, secure remotes, performance, and clean service/module architecture.",
+    "language": "luau",
+    "guidelines": [
+      "Use Luau syntax and Roblox APIs (no vanilla Lua-only features).",
+      "Edit only under src/* (Rojo-mapped) and keep Studio instances clean.",
+      "Favor ModuleScripts; avoid introducing frameworks unless requested.",
+      "Validate all RemoteEvent/RemoteFunction inputs server-side (type/owner/authz).",
+      "Prefer event-driven logic (signals, CollectionService, Heartbeat) over busy loops.",
+      "Manage resources: disconnect RBXScriptConnections, task.cancel tasks, Debris cleanup.",
+      "Profile performance for per-frame work (MicroProfiler/Script Performance).",
+      "Add Luau type annotations and address Selene warnings on changed code.",
+      "Centralize remotes/config in ReplicatedStorage; keep cohesive Services in ServerScriptService/Services."
+    ]
+  },
+  "docs": [
+    { "name": "Roblox API Reference", "url": "https://create.roblox.com/docs/reference/engine", "crawl": true, "index": true },
+    { "name": "Luau Language Guide", "url": "https://luau-lang.org", "crawl": true, "index": true },
+    { "name": "Rojo Documentation", "url": "https://rojo.space/docs/", "crawl": true, "index": true },
+    { "name": "Selene Linter (Roblox std)", "url": "https://kampfkarren.github.io/selene/", "crawl": true, "index": true },
+    { "name": "Stylua Formatter", "url": "https://github.com/JohnnyMorganz/StyLua", "crawl": true, "index": true },
+    { "name": "PathfindingService", "url": "https://create.roblox.com/docs/reference/engine/classes/PathfindingService", "crawl": true, "index": true },
+    { "name": "PhysicsService (Collision Groups)", "url": "https://create.roblox.com/docs/reference/engine/classes/PhysicsService", "crawl": true, "index": true },
+    { "name": "DataStoreService", "url": "https://create.roblox.com/docs/reference/engine/classes/DataStoreService", "crawl": true, "index": true },
+    { "name": "Roblox Optimization Guide", "url": "https://create.roblox.com/docs/optimization", "crawl": true, "index": true }
+  ],
+  "examples": [
+    {
+      "description": "Folder structure for a Rojo project",
+      "content": "src/\n  ServerScriptService/\n    Services/\n      MyService.server.lua\n  ReplicatedStorage/\n    Modules/\n      Util.lua\n  StarterPlayer/\n    StarterPlayerScripts/\n      ClientInit.client.lua"
+    },
+    {
+      "description": "RemoteEvent debounce",
+      "content": "local remote = game.ReplicatedStorage.MyRemote\nlocal debounce = {}\nremote.OnServerEvent:Connect(function(player)\n  if debounce[player] then return end\n  debounce[player] = true\n  -- do action\n  task.delay(1, function() debounce[player] = nil end)\nend)"
+    },
+    {
+      "description": "Server-side remote validation",
+      "content": "local Remotes = require(game.ReplicatedStorage.RemoteService)\nRemotes.SomeAction.OnServerEvent:Connect(function(player, payload)\n  if typeof(payload) ~= 'table' then return end\n  local id = payload.id\n  if typeof(id) ~= 'string' or #id > 64 then return end\n  -- authorize + perform action\nend)"
+    },
+    {
+      "description": "Service module skeleton",
+      "content": "-- ServerScriptService/Services/MyService.server.lua\nlocal MyService = {}\nlocal ReplicatedStorage = game:GetService('ReplicatedStorage')\nlocal Remotes = require(ReplicatedStorage:WaitForChild('RemoteService'))\nfunction MyService.start()\n  -- init and connect events\nend\nreturn MyService"
+    },
+    {
+      "description": "Typed ModuleScript",
+      "content": "-- ReplicatedStorage/Modules/Util.lua\nexport type Options = {speed: number, name: string}\nlocal Util = {}\nfunction Util.make(opts: Options)\n  return opts.name, opts.speed\nend\nreturn Util"
+    }
+  ],
+  "style": {
+    "indentation": "spaces",
+    "indent_size": 4,
+    "line_length": 100,
+    "use_semicolons": false,
+    "naming_conventions": { "modules": "PascalCase", "functions": "camelCase", "variables": "camelCase" }
+  }
+}
