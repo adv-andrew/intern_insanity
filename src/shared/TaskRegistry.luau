@@ -26,15 +26,6 @@ TaskRegistry.Tasks = {
         category = "OfficeMovement",
     } :: Task,
 
-    PrinterJam = {
-        id = "PrinterJam",
-        name = "Printer Jam",
-        description = "Fix the jammed printer before the boss notices",
-        emoji = "🖨️",
-        timeToComplete = 30,
-        category = "OfficeMovement",
-    } :: Task,
-
     DeliverPaperwork = {
         id = "DeliverPaperwork",
         name = "Deliver Paperwork",
@@ -70,16 +61,6 @@ TaskRegistry.Tasks = {
         emoji = "🧍",
         timeToComplete = 60,
         category = "MentalBreaks",
-    } :: Task,
-
-    -- 👥 Coworker / Social Tasks
-    CoworkerConflict = {
-        id = "CoworkerConflict",
-        name = "Coworker Conflict",
-        description = "Two coworkers are arguing. Pick a side or stay neutral",
-        emoji = "😠",
-        timeToComplete = 35,
-        category = "SocialTasks",
     } :: Task,
 
     PeerCodeReview = {
@@ -128,6 +109,15 @@ TaskRegistry.Tasks = {
         category = "TechTasks",
     } :: Task,
 
+    PrinterJam = {
+        id = "PrinterJam",
+        name = "Printer Jam",
+        description = "Fix the jammed printer before the boss notices",
+        emoji = "🖨️",
+        timeToComplete = 40,
+        category = "OfficeMovement",
+    } :: Task,
+
     AWSOutage = {
         id = "AWSOutage",
         name = "AWS Outage: Servers on Fire",
@@ -136,6 +126,17 @@ TaskRegistry.Tasks = {
         timeToComplete = 45,
         category = "TechTasks",
     } :: Task,
+
+        -- 👥 Coworker / Social Tasks
+        CoworkerConflict = {
+            id = "CoworkerConflict",
+            name = "Coworker Conflict",
+            description = "Two coworkers are arguing. Pick a side or stay neutral",
+            emoji = "😠",
+            timeToComplete = 35,
+            category = "SocialTasks",
+        } :: Task,
+    
 
     FixBugQuiz = {
         id = "FixBugQuiz",
