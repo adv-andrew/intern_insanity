@@ -12,6 +12,7 @@ local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
 
 local DoorHighlight = require(script.Parent.DoorHighlight)
 local RoomDetection = require(script.Parent.RoomDetection)
+local TaskBehaviors = require(script.Parent.TaskBehaviors)
 
 local TaskManager = {}
 
@@ -20,6 +21,7 @@ local selectedTask = nil -- Track currently selected task
 local selectedTaskData = nil -- Track the task data of selected task
 local allTaskFrames = {} -- Store all task frames for unselecting
 local taskFrameToData = {} -- Map task frames to their task data
+local currentObjectiveIndex = 1 -- Track which objective the player is on
 
 -- Colors
 local SELECTED_COLOR = Color3.fromRGB(52, 152, 219) -- Blue
@@ -47,6 +49,7 @@ local function autoSelectTask(taskFrame, taskData)
 
     selectedTask = taskFrame
     selectedTaskData = taskData
+    currentObjectiveIndex = 1 -- Reset to first objective
 
     -- Update door highlighting based on first objective
     if taskData.objectives and #taskData.objectives > 0 then
@@ -54,6 +57,40 @@ local function autoSelectTask(taskFrame, taskData)
         DoorHighlight.updateHighlight(firstObjective.room, firstObjective.objectModel)
     else
         DoorHighlight.clear()
+    end
+end
+
+-- Handle objective completion
+function TaskManager.completeObjective()
+    if not selectedTaskData or not selectedTaskData.objectives then
+        return
+    end
+
+    -- Check if this was the last objective
+    if currentObjectiveIndex >= #selectedTaskData.objectives then
+        print("[TaskManager] Task completed:", selectedTaskData.name)
+        -- Remove the task frame
+        if selectedTask then
+            selectedTask:Destroy()
+            -- Remove from tracking
+            for i, frame in ipairs(allTaskFrames) do
+                if frame == selectedTask then
+                    table.remove(allTaskFrames, i)
+                    break
+                end
+            end
+            taskFrameToData[selectedTask] = nil
+        end
+        selectedTask = nil
+        selectedTaskData = nil
+        currentObjectiveIndex = 1
+        DoorHighlight.clear()
+    else
+        -- Move to next objective
+        currentObjectiveIndex = currentObjectiveIndex + 1
+        local nextObjective = selectedTaskData.objectives[currentObjectiveIndex]
+        print("[TaskManager] Moving to next objective:", nextObjective.description)
+        DoorHighlight.updateHighlight(nextObjective.room, nextObjective.objectModel)
     end
 end
 
@@ -161,6 +198,9 @@ end
 
 -- Start listening for server task spawns
 function TaskManager.start()
+    -- Set TaskManager reference in DoorHighlight to avoid circular dependency
+    DoorHighlight.setTaskManager(TaskManager)
+
     -- Listen for task spawn events from server
     RemoteEvents.SpawnTask.OnClientEvent:Connect(function(taskData: TaskRegistry.Task)
         spawnTask(taskData)
@@ -168,11 +208,21 @@ function TaskManager.start()
 
     -- Update door highlighting when room changes
     RunService.Heartbeat:Connect(function()
-        if selectedTaskData and selectedTaskData.objectives and #selectedTaskData.objectives > 0 then
-            local firstObjective = selectedTaskData.objectives[1]
-            DoorHighlight.updateHighlight(firstObjective.room, firstObjective.objectModel)
+        if selectedTaskData and selectedTaskData.objectives and currentObjectiveIndex <= #selectedTaskData.objectives then
+            local currentObjective = selectedTaskData.objectives[currentObjectiveIndex]
+            DoorHighlight.updateHighlight(currentObjective.room, currentObjective.objectModel)
         end
     end)
+end
+
+-- Get current objective index
+function TaskManager.getCurrentObjectiveIndex(): number
+    return currentObjectiveIndex
+end
+
+-- Get selected task data
+function TaskManager.getSelectedTaskData()
+    return selectedTaskData
 end
 
 -- Get the currently selected task frame

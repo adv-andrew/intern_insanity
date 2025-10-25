@@ -7,8 +7,14 @@ local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RoomDetection = require(script.Parent.RoomDetection)
+local TaskManager = nil -- Will be set via setTaskManager to avoid circular dependency
 
 local DoorHighlight = {}
+
+-- Set TaskManager reference (called from TaskManager to avoid circular dependency)
+function DoorHighlight.setTaskManager(taskManagerModule)
+    TaskManager = taskManagerModule
+end
 
 local player = Players.LocalPlayer
 
@@ -221,10 +227,25 @@ local function highlightObject(objectPath: string)
         proximityPrompt.Parent = targetPart
         currentProximityPrompt = proximityPrompt
 
-        -- Connect to proximity prompt triggered event (for future use)
+        -- Connect to proximity prompt triggered event
         proximityPrompt.Triggered:Connect(function(playerWhoTriggered)
             print("[DoorHighlight] Player interacted with:", objectPath)
-            -- TODO: Handle objective completion
+
+            -- Handle task-specific behavior
+            if TaskManager then
+                local taskData = TaskManager.getSelectedTaskData()
+                local objectiveIndex = TaskManager.getCurrentObjectiveIndex()
+
+                if taskData and taskData.id == "PrinterJam" then
+                    local TaskBehaviors = require(script.Parent.TaskBehaviors)
+                    local success = TaskBehaviors.handlePrinterJamInteraction(objectPath, objectiveIndex)
+
+                    if success then
+                        -- Complete the objective
+                        TaskManager.completeObjective()
+                    end
+                end
+            end
         end)
     else
         warn("[DoorHighlight] No BasePart/MeshPart found in object:", objectPath)
