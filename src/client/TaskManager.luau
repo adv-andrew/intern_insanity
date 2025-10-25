@@ -26,6 +26,37 @@ local SELECTED_COLOR = Color3.fromRGB(52, 152, 219) -- Blue
 local DEFAULT_TASK_COLOR = Color3.fromRGB(255, 255, 255) -- Default dark gray
 local DEFAULT_ICON_COLOR = Color3.fromRGB(255, 255, 255) -- Default icon background
 
+-- Auto-select a task
+local function autoSelectTask(taskFrame, taskData)
+    local icon = taskFrame:FindFirstChild("Icon")
+
+    -- Unselect all tasks first
+    for _, frame in ipairs(allTaskFrames) do
+        frame.BackgroundColor3 = DEFAULT_TASK_COLOR
+        local frameIcon = frame:FindFirstChild("Icon")
+        if frameIcon then
+            frameIcon.BackgroundColor3 = DEFAULT_ICON_COLOR
+        end
+    end
+
+    -- Select this task
+    taskFrame.BackgroundColor3 = SELECTED_COLOR
+    if icon then
+        icon.BackgroundColor3 = SELECTED_COLOR
+    end
+
+    selectedTask = taskFrame
+    selectedTaskData = taskData
+
+    -- Update door highlighting based on first objective
+    if taskData.objectives and #taskData.objectives > 0 then
+        local firstObjective = taskData.objectives[1]
+        DoorHighlight.updateHighlight(firstObjective.room)
+    else
+        DoorHighlight.clear()
+    end
+end
+
 -- Spawn and populate a task frame with server-provided task data
 local function spawnTask(taskData: TaskRegistry.Task)
     local player = Players.LocalPlayer
@@ -69,35 +100,16 @@ local function spawnTask(taskData: TaskRegistry.Task)
     table.insert(allTaskFrames, newTask)
     taskFrameToData[newTask] = taskData
 
+    -- Auto-select if this is the first task and no task is currently selected
+    if currentTaskCount == 1 and not selectedTask then
+        autoSelectTask(newTask, taskData)
+    end
+
     -- Setup selection button
     local selectButton = newTask:FindFirstChild("SelectButton")
     if selectButton then
         selectButton.Activated:Connect(function()
-            -- Unselect all tasks
-            for _, taskFrame in ipairs(allTaskFrames) do
-                taskFrame.BackgroundColor3 = DEFAULT_TASK_COLOR
-                local taskIcon = taskFrame:FindFirstChild("Icon")
-                if taskIcon then
-                    taskIcon.BackgroundColor3 = DEFAULT_ICON_COLOR
-                end
-            end
-
-            -- Select this task
-            newTask.BackgroundColor3 = SELECTED_COLOR
-            if icon then
-                icon.BackgroundColor3 = SELECTED_COLOR
-            end
-
-            selectedTask = newTask
-            selectedTaskData = taskData
-
-            -- Update door highlighting based on first objective
-            if taskData.objectives and #taskData.objectives > 0 then
-                local firstObjective = taskData.objectives[1]
-                DoorHighlight.updateHighlight(firstObjective.room)
-            else
-                DoorHighlight.clear()
-            end
+            autoSelectTask(newTask, taskData)
         end)
     end
 
