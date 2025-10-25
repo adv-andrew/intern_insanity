@@ -24,7 +24,7 @@ local function applySpeakerAnimation()
     end
 
     -- Apply animation to both Speaker1 and Speaker2
-    local speakers = {"Speaker1", "Speaker2"}
+    local speakers = {"Speaker1", "Speaker2", "Speaker3"}
 
     for _, speakerName in ipairs(speakers) do
         local speaker = npcs:FindFirstChild(speakerName)
