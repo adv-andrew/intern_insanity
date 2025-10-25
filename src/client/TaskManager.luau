@@ -69,22 +69,36 @@ function TaskManager.completeObjective()
     -- Check if this was the last objective
     if currentObjectiveIndex >= #selectedTaskData.objectives then
         print("[TaskManager] Task completed:", selectedTaskData.name)
+
+        -- Store reference to completed task before removing
+        local completedTask = selectedTask
+
         -- Remove the task frame
         if selectedTask then
             selectedTask:Destroy()
             -- Remove from tracking
             for i, frame in ipairs(allTaskFrames) do
-                if frame == selectedTask then
+                if frame == completedTask then
                     table.remove(allTaskFrames, i)
                     break
                 end
             end
-            taskFrameToData[selectedTask] = nil
+            taskFrameToData[completedTask] = nil
         end
+
         selectedTask = nil
         selectedTaskData = nil
         currentObjectiveIndex = 1
         DoorHighlight.clear()
+
+        -- Auto-select next task if available
+        if #allTaskFrames > 0 then
+            local nextTaskFrame = allTaskFrames[1]
+            local nextTaskData = taskFrameToData[nextTaskFrame]
+            if nextTaskFrame and nextTaskData then
+                autoSelectTask(nextTaskFrame, nextTaskData)
+            end
+        end
     else
         -- Move to next objective
         currentObjectiveIndex = currentObjectiveIndex + 1
