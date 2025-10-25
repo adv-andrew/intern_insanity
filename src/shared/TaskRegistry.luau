@@ -3,6 +3,11 @@
 
 export type TaskCategory = "OfficeMovement" | "MentalBreaks" | "SocialTasks" | "TechTasks"
 
+export type TaskObjective = {
+    description: string,
+    room: string, -- Room where objective must be completed
+}
+
 export type Task = {
     id: string,
     name: string,
@@ -10,6 +15,7 @@ export type Task = {
     emoji: string,
     timeToComplete: number, -- in seconds
     category: TaskCategory,
+    objectives: { TaskObjective }?, -- Optional list of objectives
 }
 
 local TaskRegistry = {}
@@ -116,6 +122,10 @@ TaskRegistry.Tasks = {
         emoji = "🖨️",
         timeToComplete = 40,
         category = "OfficeMovement",
+        objectives = {
+            { description = "Get paper from Conference room", room = "Conference" },
+            { description = "Deliver paper to Office printer", room = "Office" },
+        },
     } :: Task,
 
     AWSOutage = {
@@ -125,6 +135,9 @@ TaskRegistry.Tasks = {
         emoji = "🔥",
         timeToComplete = 45,
         category = "TechTasks",
+        objectives = {
+            { description = "Go to Server room and reboot servers", room = "Server" },
+        },
     } :: Task,
 
         -- 👥 Coworker / Social Tasks
@@ -135,6 +148,9 @@ TaskRegistry.Tasks = {
             emoji = "😠",
             timeToComplete = 35,
             category = "SocialTasks",
+            objectives = {
+                { description = "Go to Manager's office to mediate", room = "Manager" },
+            },
         } :: Task,
     
 
@@ -145,6 +161,9 @@ TaskRegistry.Tasks = {
         emoji = "🐛",
         timeToComplete = 50,
         category = "TechTasks",
+        objectives = {
+            { description = "Go to Office and fix the code", room = "Office" },
+        },
     } :: Task,
 }
 

@@ -3,17 +3,23 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 -- Wait for shared modules
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local TaskRegistry = require(Shared:WaitForChild("TaskRegistry"))
 local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
 
+local DoorHighlight = require(script.Parent.DoorHighlight)
+local RoomDetection = require(script.Parent.RoomDetection)
+
 local TaskManager = {}
 
 local currentTaskCount = 0
 local selectedTask = nil -- Track currently selected task
+local selectedTaskData = nil -- Track the task data of selected task
 local allTaskFrames = {} -- Store all task frames for unselecting
+local taskFrameToData = {} -- Map task frames to their task data
 
 -- Colors
 local SELECTED_COLOR = Color3.fromRGB(52, 152, 219) -- Blue
@@ -61,6 +67,7 @@ local function spawnTask(taskData: TaskRegistry.Task)
 
     -- Store task frame reference
     table.insert(allTaskFrames, newTask)
+    taskFrameToData[newTask] = taskData
 
     -- Setup selection button
     local selectButton = newTask:FindFirstChild("SelectButton")
@@ -82,6 +89,15 @@ local function spawnTask(taskData: TaskRegistry.Task)
             end
 
             selectedTask = newTask
+            selectedTaskData = taskData
+
+            -- Update door highlighting based on first objective
+            if taskData.objectives and #taskData.objectives > 0 then
+                local firstObjective = taskData.objectives[1]
+                DoorHighlight.updateHighlight(firstObjective.room)
+            else
+                DoorHighlight.clear()
+            end
         end)
     end
 
@@ -136,6 +152,14 @@ function TaskManager.start()
     -- Listen for task spawn events from server
     RemoteEvents.SpawnTask.OnClientEvent:Connect(function(taskData: TaskRegistry.Task)
         spawnTask(taskData)
+    end)
+
+    -- Update door highlighting when room changes
+    RunService.Heartbeat:Connect(function()
+        if selectedTaskData and selectedTaskData.objectives and #selectedTaskData.objectives > 0 then
+            local firstObjective = selectedTaskData.objectives[1]
+            DoorHighlight.updateHighlight(firstObjective.room)
+        end
     end)
 end
 
