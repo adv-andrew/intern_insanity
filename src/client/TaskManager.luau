@@ -296,12 +296,17 @@ end
 
 -- Mark player as failed (called when wrong answer is selected)
 function TaskManager.markPlayerFailed()
-    playerPassed = false
-    print("[TaskManager] Player marked as FAILED")
+    if playerPassed then
+        playerPassed = false
+        print("[TaskManager] ❌ Player marked as FAILED - this is PERMANENT")
+    else
+        print("[TaskManager] ❌ Player already failed (attempted to fail again)")
+    end
 end
 
 -- Get whether player has passed
 function TaskManager.hasPlayerPassed(): boolean
+    print("[TaskManager] Checking pass status:", playerPassed and "✅ PASSED" or "❌ FAILED")
     return playerPassed
 end
 

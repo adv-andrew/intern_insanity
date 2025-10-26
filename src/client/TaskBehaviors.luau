@@ -267,8 +267,14 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
             return false
         end
 
-        -- Check if player passed or failed
-        local playerPassed = TaskManager and TaskManager.hasPlayerPassed() or true
+        -- Check if player passed or failed (NO default fallback - must have TaskManager)
+        if not TaskManager then
+            warn("[TaskBehaviors] TaskManager not available")
+            return false
+        end
+
+        local playerPassed = TaskManager.hasPlayerPassed()
+        print("[TaskBehaviors] Player pass status:", playerPassed)
 
         -- Show speech bubble sequence based on pass/fail
         task.spawn(function()
