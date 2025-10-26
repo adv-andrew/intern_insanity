@@ -95,6 +95,9 @@ function TaskManager.completeObjective()
         -- Play green flash animation
         FadeController.greenFlash()
 
+        -- Store the completed task ID before clearing
+        local completedTaskId = selectedTaskData.id
+
         -- Store reference to completed task before removing
         local completedTask = selectedTask
 
@@ -117,6 +120,9 @@ function TaskManager.completeObjective()
         currentObjectiveIndex = 1
         DoorHighlight.clear()
         updateObjectiveDescription()
+
+        -- Notify server that task was completed
+        RemoteEvents.TaskCompleted:FireServer(completedTaskId)
 
         -- Auto-select next task if available
         if #allTaskFrames > 0 then

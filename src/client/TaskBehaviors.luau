@@ -30,6 +30,9 @@ local coworkerTaskCompletionCallback = nil
 -- FixBugQuiz task state
 local bugTaskCompletionCallback = nil
 
+-- TalkToBoss task state
+local bossTaskCompletionCallback = nil
+
 -- Handle PrinterJam task interactions
 function TaskBehaviors.handlePrinterJamInteraction(objectPath: string, currentObjectiveIndex: number)
     if objectPath == "Conference.PaperStack" and currentObjectiveIndex == 1 then
@@ -238,6 +241,31 @@ function TaskBehaviors.handleFixBugQuizInteraction(objectPath: string, currentOb
             return false
         else
             warn("[TaskBehaviors] BugTask GUI not found!")
+            return false
+        end
+    end
+    return false
+end
+
+-- Handle TalkToBoss task interactions
+function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentObjectiveIndex: number, completionCallback)
+    if objectPath == "Manager.Boss" and currentObjectiveIndex == 1 then
+        -- Open the BossTask GUI
+        local playerGui = player:WaitForChild("PlayerGui")
+        local mainGui = playerGui:WaitForChild("MainGui")
+        local bossTask = mainGui:FindFirstChild("BossTask")
+
+        if bossTask then
+            bossTask.Visible = true
+            print("[TaskBehaviors] BossTask GUI opened")
+
+            -- Store the completion callback
+            bossTaskCompletionCallback = completionCallback
+
+            -- Task is not completed yet - waiting for player interaction with GUI
+            return false
+        else
+            warn("[TaskBehaviors] BossTask GUI not found!")
             return false
         end
     end

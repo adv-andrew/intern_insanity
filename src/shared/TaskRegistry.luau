@@ -186,6 +186,22 @@ TaskRegistry.Tasks = {
             },
         },
     } :: Task,
+
+    TalkToBoss = {
+        id = "TalkToBoss",
+        name = "Talk to Boss",
+        description = "The boss wants to see you in the manager room",
+        emoji = "👔",
+        timeToComplete = 60,
+        category = "SocialTasks",
+        objectives = {
+            {
+                description = "Go to Manager room and talk to the boss",
+                room = "Manager",
+                objectModel = "BossRoom.Boss",
+            },
+        },
+    } :: Task,
 }
 
 -- Get all tasks as an array

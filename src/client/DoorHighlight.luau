@@ -289,6 +289,21 @@ local function highlightObject(objectPath: string)
                         -- Complete the objective immediately (won't happen - task waits for bug fix)
                         TaskManager.completeObjective()
                     end
+                elseif taskData and taskData.id == "TalkToBoss" then
+                    -- Pass a completion callback for when the player talks to the boss
+                    local success = TaskBehaviors.handleTalkToBossInteraction(
+                        objectPath,
+                        objectiveIndex,
+                        function()
+                            -- Called when player interacts with BossTask GUI
+                            TaskManager.completeObjective()
+                        end
+                    )
+
+                    if success then
+                        -- Complete the objective immediately (won't happen - task waits for GUI interaction)
+                        TaskManager.completeObjective()
+                    end
                 end
             end
         end)

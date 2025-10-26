@@ -53,4 +53,19 @@ end
 
 RemoteEvents.DoorTeleport = doorTeleportEvent
 
+-- Find or create RemoteEvent for task completion signal
+local taskCompletedEvent = ReplicatedStorage:FindFirstChild("TaskCompletedEvent")
+
+if not taskCompletedEvent then
+    if RunService:IsServer() then
+        taskCompletedEvent = Instance.new("RemoteEvent")
+        taskCompletedEvent.Name = "TaskCompletedEvent"
+        taskCompletedEvent.Parent = ReplicatedStorage
+    else
+        taskCompletedEvent = ReplicatedStorage:WaitForChild("TaskCompletedEvent", 10)
+    end
+end
+
+RemoteEvents.TaskCompleted = taskCompletedEvent
+
 return RemoteEvents
