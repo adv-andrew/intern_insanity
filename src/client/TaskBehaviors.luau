@@ -338,6 +338,39 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
 
                     print("[TaskBehaviors] Switched camera to CutscenePart")
 
+                    -- Apply winning animation to Intern NPC in cutscene
+                    local cutsceneArea = Workspace:FindFirstChild("CutsceneArea")
+                    if cutsceneArea then
+                        local intern = cutsceneArea:FindFirstChild("Intern")
+                        if intern and intern:IsA("Model") then
+                            local humanoid = intern:FindFirstChildOfClass("Humanoid")
+                            if humanoid then
+                                local success, err = pcall(function()
+                                    local animator = humanoid:FindFirstChildOfClass("Animator")
+                                    if not animator then
+                                        animator = Instance.new("Animator")
+                                        animator.Parent = humanoid
+                                    end
+
+                                    local anim = Instance.new("Animation")
+                                    anim.AnimationId = "rbxassetid://3716636630"
+                                    local animationTrack = animator:LoadAnimation(anim)
+                                    animationTrack:Play()
+                                    print("[TaskBehaviors] Playing winning animation on Intern NPC")
+                                end)
+                                if not success then
+                                    warn("[TaskBehaviors] Failed to load winning animation:", err)
+                                end
+                            else
+                                warn("[TaskBehaviors] Intern has no Humanoid")
+                            end
+                        else
+                            warn("[TaskBehaviors] Intern not found in CutsceneArea")
+                        end
+                    else
+                        warn("[TaskBehaviors] CutsceneArea not found in Workspace")
+                    end
+
                     -- Disable MainGui
                     local playerGui = player:WaitForChild("PlayerGui")
                     local mainGui = playerGui:FindFirstChild("MainGui")
@@ -413,18 +446,29 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
 
                     print("[TaskBehaviors] Switched camera to CutscenePart")
 
-                    -- Apply animation to Intern NPC in cutscene
+                    -- Apply failure animation to Intern NPC in cutscene
                     local cutsceneArea = Workspace:FindFirstChild("CutsceneArea")
                     if cutsceneArea then
                         local intern = cutsceneArea:FindFirstChild("Intern")
                         if intern and intern:IsA("Model") then
                             local humanoid = intern:FindFirstChildOfClass("Humanoid")
                             if humanoid then
-                                local anim = Instance.new("Animation")
-                                anim.AnimationId = "rbxassetid://96518341091970"
-                                local animationTrack = humanoid:LoadAnimation(anim)
-                                animationTrack:Play()
-                                print("[TaskBehaviors] Playing animation on Intern NPC")
+                                local success, err = pcall(function()
+                                    local animator = humanoid:FindFirstChildOfClass("Animator")
+                                    if not animator then
+                                        animator = Instance.new("Animator")
+                                        animator.Parent = humanoid
+                                    end
+
+                                    local anim = Instance.new("Animation")
+                                    anim.AnimationId = "rbxassetid://96518341091970"
+                                    local animationTrack = animator:LoadAnimation(anim)
+                                    animationTrack:Play()
+                                    print("[TaskBehaviors] Playing failure animation on Intern NPC")
+                                end)
+                                if not success then
+                                    warn("[TaskBehaviors] Failed to load failure animation:", err)
+                                end
                             else
                                 warn("[TaskBehaviors] Intern has no Humanoid")
                             end
