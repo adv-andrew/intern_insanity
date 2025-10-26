@@ -290,10 +290,57 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                     "I WILL GIVE YOU A RETURN OFFER!"
                 }, 2.5)
 
+                print("[TaskBehaviors] Speech bubbles started, waiting 2 seconds...")
                 -- Wait for speech bubbles to finish (3 messages * 2.5 seconds each)
-                task.wait(7.5)
+                task.wait(2)
 
-                -- Complete the task
+                print("[TaskBehaviors] Speech bubbles finished, starting cutscene...")
+
+                -- Trigger fade to black with camera switch at midpoint
+                print("[TaskBehaviors] Starting fade transition...")
+                FadeController.fadeToBlackWithCallback(function()
+                    print("[TaskBehaviors] Fade midpoint reached - switching camera")
+
+                    -- At midpoint (screen is fully black), switch camera to cutscene
+                    local cutscenePart = Workspace:FindFirstChild("CutscenePart")
+                    if not cutscenePart then
+                        warn("[TaskBehaviors] CutscenePart not found in Workspace")
+                        return
+                    end
+
+                    print("[TaskBehaviors] Found CutscenePart at position:", cutscenePart.Position)
+                    print("[TaskBehaviors] CutscenePart CFrame:", cutscenePart.CFrame)
+
+                    -- Create a new Camera instance
+                    local cutsceneCamera = Instance.new("Camera")
+                    cutsceneCamera.Name = "CutsceneCamera"
+
+                    -- Set camera CFrame to match CutscenePart's CFrame exactly
+                    cutsceneCamera.CFrame = cutscenePart.CFrame
+
+                    -- Set camera Focus to the CutscenePart position
+                    cutsceneCamera.Focus = CFrame.new(cutscenePart.Position)
+
+                    -- Parent the camera to CutscenePart
+                    cutsceneCamera.Parent = cutscenePart
+                    print("[TaskBehaviors] Created camera at CFrame:", cutsceneCamera.CFrame)
+                    print("[TaskBehaviors] Camera Focus set to:", cutsceneCamera.Focus)
+                    print("[TaskBehaviors] Camera parented to CutscenePart")
+
+                    -- Set the workspace's current camera to the cutscene camera
+                    Workspace.CurrentCamera = cutsceneCamera
+                    print("[TaskBehaviors] Set Workspace.CurrentCamera to cutsceneCamera")
+
+                    -- Verify final camera position
+                    print("[TaskBehaviors] Final Camera Position:", Workspace.CurrentCamera.CFrame.Position)
+                    print("[TaskBehaviors] Final Camera Focus:", Workspace.CurrentCamera.Focus.Position)
+                    print("[TaskBehaviors] CutscenePart Position:", cutscenePart.CFrame.Position)
+
+                    print("[TaskBehaviors] Switched camera to CutscenePart")
+                end)
+                print("[TaskBehaviors] Fade transition complete")
+
+                -- Complete the task after cutscene
                 if bossTaskCompletionCallback then
                     bossTaskCompletionCallback()
                     bossTaskCompletionCallback = nil
@@ -309,11 +356,11 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
 
                 print("[TaskBehaviors] Speech bubbles started, waiting 7.5 seconds...")
                 -- Wait for speech bubbles to finish (3 messages * 2.5 seconds each)
-                task.wait(7.5)
+                task.wait(2)
 
                 print("[TaskBehaviors] Speech bubbles finished, waiting 5 more seconds...")
                 -- Wait 5 more seconds after "YOU'RE FIRED"
-                task.wait(5)
+                
                 print("[TaskBehaviors] 5 second wait complete, starting cutscene...")
 
                 -- Trigger fade to black with camera switch at midpoint
