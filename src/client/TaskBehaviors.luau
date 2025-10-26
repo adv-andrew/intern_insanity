@@ -328,19 +328,33 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                         return
                     end
 
-                    print("[TaskBehaviors] Found CutscenePart at:", cutscenePart.CFrame)
+                    print("[TaskBehaviors] Found CutscenePart at position:", cutscenePart.Position)
+                    print("[TaskBehaviors] CutscenePart CFrame:", cutscenePart.CFrame)
 
-                    -- Create a new Camera instance and parent it to CutscenePart
+                    -- Create a new Camera instance
                     local cutsceneCamera = Instance.new("Camera")
                     cutsceneCamera.Name = "CutsceneCamera"
+
+                    -- Set camera CFrame to match CutscenePart's CFrame exactly
                     cutsceneCamera.CFrame = cutscenePart.CFrame
+
+                    -- Set camera Focus to the CutscenePart position
+                    cutsceneCamera.Focus = CFrame.new(cutscenePart.Position)
+
+                    -- Parent the camera to CutscenePart
                     cutsceneCamera.Parent = cutscenePart
-                    print("[TaskBehaviors] Created camera instance, parented to CutscenePart")
+                    print("[TaskBehaviors] Created camera at CFrame:", cutsceneCamera.CFrame)
+                    print("[TaskBehaviors] Camera Focus set to:", cutsceneCamera.Focus)
+                    print("[TaskBehaviors] Camera parented to CutscenePart")
 
                     -- Set the workspace's current camera to the cutscene camera
                     Workspace.CurrentCamera = cutsceneCamera
                     print("[TaskBehaviors] Set Workspace.CurrentCamera to cutsceneCamera")
-                    print("[TaskBehaviors] Camera CFrame:", cutsceneCamera.CFrame)
+
+                    -- Verify final camera position
+                    print("[TaskBehaviors] Final Camera Position:", Workspace.CurrentCamera.CFrame.Position)
+                    print("[TaskBehaviors] Final Camera Focus:", Workspace.CurrentCamera.Focus.Position)
+                    print("[TaskBehaviors] CutscenePart Position:", cutscenePart.CFrame.Position)
 
                     print("[TaskBehaviors] Switched camera to CutscenePart")
                 end)
