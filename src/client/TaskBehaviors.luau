@@ -171,6 +171,69 @@ function TaskBehaviors.handleFixBugQuizInteraction(objectPath: string, currentOb
             -- Store the completion callback
             bugTaskCompletionCallback = completionCallback
 
+            -- Get the Code container
+            local codeContainer = bugTask:FindFirstChild("Code")
+            if not codeContainer then
+                warn("[TaskBehaviors] BugTask.Code not found!")
+                return false
+            end
+
+            -- Get TweenService for hover effects
+            local TweenService = game:GetService("TweenService")
+            local hoverTweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+            -- Setup line selection for lines 1-6
+            for lineNumber = 1, 6 do
+                local lineLabel = codeContainer:FindFirstChild(tostring(lineNumber))
+                if lineLabel and lineLabel:IsA("TextLabel") then
+                    local selectButton = lineLabel:FindFirstChild("SelectButton")
+
+                    if selectButton and selectButton:IsA("TextButton") then
+                        -- Setup hover effects
+                        selectButton.MouseEnter:Connect(function()
+                            local hoverTween = TweenService:Create(
+                                lineLabel,
+                                hoverTweenInfo,
+                                { BackgroundTransparency = 0.95 }
+                            )
+                            hoverTween:Play()
+                        end)
+
+                        selectButton.MouseLeave:Connect(function()
+                            local unhoverTween = TweenService:Create(
+                                lineLabel,
+                                hoverTweenInfo,
+                                { BackgroundTransparency = 1 }
+                            )
+                            unhoverTween:Play()
+                        end)
+
+                        -- Setup click handler
+                        if lineNumber == 5 then
+                            -- Line 5 is correct
+                            selectButton.Activated:Connect(function()
+                                FadeController.greenFlash()
+                                bugTask.Visible = false
+
+                                -- Complete task (success)
+                                if bugTaskCompletionCallback then
+                                    bugTaskCompletionCallback()
+                                    bugTaskCompletionCallback = nil
+                                end
+                            end)
+                        else
+                            -- Lines 1, 2, 3, 4, 6 are incorrect
+                            selectButton.Activated:Connect(function()
+                                FadeController.redFlash()
+                                if TaskManager then
+                                    TaskManager.reduceCurrentTaskTime(20) -- Lose 20% of remaining time
+                                end
+                            end)
+                        end
+                    end
+                end
+            end
+
             -- Task is not completed yet - waiting for player to fix the bug
             return false
         else
