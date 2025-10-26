@@ -19,6 +19,11 @@ local playerGui = player:WaitForChild("PlayerGui")
 local startScreen = playerGui:WaitForChild("Start")
 local startButton = startScreen:WaitForChild("Button"):WaitForChild("Top"):WaitForChild("Button")
 
+-- Disable MainGui initially (will be enabled when start button is pressed)
+local mainGui = playerGui:WaitForChild("MainGui")
+mainGui.Enabled = false
+print("[Init] MainGui disabled - waiting for start button")
+
 -- Enable the Start screen when player loads in
 startScreen.Enabled = true
 
@@ -101,8 +106,8 @@ startButton.Activated:Connect(function()
     print("[Init] Camera reset to player character")
 
     -- Enable MainGui
-    local mainGui = playerGui:WaitForChild("MainGui")
     mainGui.Enabled = true
+    print("[Init] MainGui enabled")
 
     -- Get RemoteEvents
     local Shared = ReplicatedStorage:WaitForChild("Shared")
