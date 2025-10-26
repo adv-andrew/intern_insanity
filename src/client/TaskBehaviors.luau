@@ -330,16 +330,17 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
 
                     print("[TaskBehaviors] Found CutscenePart at:", cutscenePart.CFrame)
 
-                    -- Set player's camera to scriptable mode and position it
-                    local currentCamera = Workspace.CurrentCamera
-                    if currentCamera then
-                        print("[TaskBehaviors] Setting camera type to Scriptable")
-                        currentCamera.CameraType = Enum.CameraType.Scriptable
-                        currentCamera.CFrame = cutscenePart.CFrame
-                        print("[TaskBehaviors] Camera CFrame set to:", currentCamera.CFrame)
-                    else
-                        warn("[TaskBehaviors] CurrentCamera not found")
-                    end
+                    -- Create a new Camera instance and parent it to CutscenePart
+                    local cutsceneCamera = Instance.new("Camera")
+                    cutsceneCamera.Name = "CutsceneCamera"
+                    cutsceneCamera.CFrame = cutscenePart.CFrame
+                    cutsceneCamera.Parent = cutscenePart
+                    print("[TaskBehaviors] Created camera instance, parented to CutscenePart")
+
+                    -- Set the workspace's current camera to the cutscene camera
+                    Workspace.CurrentCamera = cutsceneCamera
+                    print("[TaskBehaviors] Set Workspace.CurrentCamera to cutsceneCamera")
+                    print("[TaskBehaviors] Camera CFrame:", cutsceneCamera.CFrame)
 
                     print("[TaskBehaviors] Switched camera to CutscenePart")
                 end)
