@@ -113,4 +113,19 @@ end
 
 RemoteEvents.UpdateHighscore = updateHighscoreEvent
 
+-- Find or create RemoteFunction for getting leaderboard data
+local getLeaderboardFunction = ReplicatedStorage:FindFirstChild("GetLeaderboardFunction")
+
+if not getLeaderboardFunction then
+	if RunService:IsServer() then
+		getLeaderboardFunction = Instance.new("RemoteFunction")
+		getLeaderboardFunction.Name = "GetLeaderboardFunction"
+		getLeaderboardFunction.Parent = ReplicatedStorage
+	else
+		getLeaderboardFunction = ReplicatedStorage:WaitForChild("GetLeaderboardFunction", 10)
+	end
+end
+
+RemoteEvents.GetLeaderboard = getLeaderboardFunction
+
 return RemoteEvents

@@ -71,6 +71,64 @@ function DataStore.getPlayerHighscore(player: Player): number
 	return playerHighscores[player] or 0
 end
 
+-- Get top players by highscore (returns array of {Name, Highscore, Position})
+function DataStore.getTopPlayers(count: number): {{Name: string, Highscore: number, Position: number}}
+	local playerList = {}
+
+	-- Gather all players and their highscores
+	for player, highscore in pairs(playerHighscores) do
+		table.insert(playerList, {
+			Player = player,
+			Name = player.Name,
+			Highscore = highscore
+		})
+	end
+
+	-- Sort by highscore descending
+	table.sort(playerList, function(a, b)
+		return a.Highscore > b.Highscore
+	end)
+
+	-- Build top N list with positions
+	local topPlayers = {}
+	for i = 1, math.min(count, #playerList) do
+		table.insert(topPlayers, {
+			Name = playerList[i].Name,
+			Highscore = playerList[i].Highscore,
+			Position = i
+		})
+	end
+
+	return topPlayers
+end
+
+-- Get player's leaderboard position
+function DataStore.getPlayerPosition(targetPlayer: Player): number
+	local playerList = {}
+
+	-- Gather all players and their highscores
+	for player, highscore in pairs(playerHighscores) do
+		table.insert(playerList, {
+			Player = player,
+			Highscore = highscore
+		})
+	end
+
+	-- Sort by highscore descending
+	table.sort(playerList, function(a, b)
+		return a.Highscore > b.Highscore
+	end)
+
+	-- Find position
+	for i, data in ipairs(playerList) do
+		if data.Player == targetPlayer then
+			return i
+		end
+	end
+
+	return #playerList -- Default to last position
+end
+
 -- Update highscore if new score is higher (called at end of round)
 function DataStore.updateHighscore(player: Player, newScore: number): boolean
 	local currentHighscore = playerHighscores[player] or 0
@@ -142,6 +200,38 @@ function DataStore.init()
 			end
 		end
 	end)
+
+	-- Handle leaderboard data requests from client
+	RemoteEvents.GetLeaderboard.OnServerInvoke = function(player)
+		-- Get top 9 players
+		local topPlayers = DataStore.getTopPlayers(9)
+
+		-- Get the requesting player's data
+		local playerPosition = DataStore.getPlayerPosition(player)
+		local playerHighscore = DataStore.getPlayerHighscore(player)
+		local playerCoins = 0
+
+		local leaderstats = player:FindFirstChild("leaderstats")
+		if leaderstats then
+			local coins = leaderstats:FindFirstChild("Coins")
+			if coins then
+				playerCoins = coins.Value
+			end
+		end
+
+		local leaderboardData = {
+			TopPlayers = topPlayers,
+			YourData = {
+				Name = player.Name,
+				Position = playerPosition,
+				Highscore = playerHighscore,
+				Coins = playerCoins
+			}
+		}
+
+		print(`[DataStore] Sent leaderboard data to {player.Name}`)
+		return leaderboardData
+	end
 
 	print("[DataStore] DataStore system initialized")
 end

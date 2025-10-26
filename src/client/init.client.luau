@@ -25,6 +25,11 @@ local mainGui = playerGui:WaitForChild("MainGui")
 mainGui.Enabled = false
 print("[Init] MainGui disabled - waiting for start button")
 
+-- Disable EndGui initially (will be enabled at end of round)
+local endGui = playerGui:WaitForChild("EndGui")
+endGui.Enabled = false
+print("[Init] EndGui disabled - will show at end of round")
+
 -- Enable the Start screen when player loads in
 startScreen.Enabled = true
 
@@ -106,9 +111,10 @@ startButton.Activated:Connect(function()
     camera.CameraSubject = humanoid
     print("[Init] Camera reset to player character")
 
-    -- Enable MainGui
+    -- Enable MainGui and disable EndGui
     mainGui.Enabled = true
-    print("[Init] MainGui enabled")
+    endGui.Enabled = false
+    print("[Init] MainGui enabled, EndGui disabled for new round")
 
     -- Get RemoteEvents
     local Shared = ReplicatedStorage:WaitForChild("Shared")

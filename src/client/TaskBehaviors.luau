@@ -8,6 +8,11 @@ local Workspace = game:GetService("Workspace")
 local ServerTaskMinigame = require(script.Parent.ServerTaskMinigame)
 local FadeController = require(script.Parent.FadeController)
 local SpeechBubble = require(script.Parent.SpeechBubble)
+local LeaderboardDisplay = require(script.Parent.LeaderboardDisplay)
+
+-- Get RemoteEvents
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
 
 local TaskBehaviors = {}
 
@@ -376,13 +381,17 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                         warn("[TaskBehaviors] CutsceneArea not found in Workspace")
                     end
 
-                    -- Disable MainGui
+                    -- Disable MainGui and show leaderboard
                     local playerGui = player:WaitForChild("PlayerGui")
                     local mainGui = playerGui:FindFirstChild("MainGui")
                     if mainGui then
                         mainGui.Enabled = false
                         print("[TaskBehaviors] Disabled MainGui")
                     end
+
+                    -- Show leaderboard
+                    task.wait(0.5) -- Small delay for dramatic effect
+                    LeaderboardDisplay.show()
                 end)
                 print("[TaskBehaviors] Fade transition complete")
 
@@ -493,13 +502,17 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                         warn("[TaskBehaviors] CutsceneArea not found in Workspace")
                     end
 
-                    -- Disable MainGui
+                    -- Disable MainGui and show leaderboard
                     local playerGui = player:WaitForChild("PlayerGui")
                     local mainGui = playerGui:FindFirstChild("MainGui")
                     if mainGui then
                         mainGui.Enabled = false
                         print("[TaskBehaviors] Disabled MainGui")
                     end
+
+                    -- Show leaderboard
+                    task.wait(0.5) -- Small delay for dramatic effect
+                    LeaderboardDisplay.show()
                 end)
                 print("[TaskBehaviors] Fade transition complete")
 
