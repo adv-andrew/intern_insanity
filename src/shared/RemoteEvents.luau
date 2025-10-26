@@ -98,4 +98,19 @@ end
 
 RemoteEvents.ResetCoins = resetCoinsEvent
 
+-- Find or create RemoteEvent for updating highscore at end of round
+local updateHighscoreEvent = ReplicatedStorage:FindFirstChild("UpdateHighscoreEvent")
+
+if not updateHighscoreEvent then
+	if RunService:IsServer() then
+		updateHighscoreEvent = Instance.new("RemoteEvent")
+		updateHighscoreEvent.Name = "UpdateHighscoreEvent"
+		updateHighscoreEvent.Parent = ReplicatedStorage
+	else
+		updateHighscoreEvent = ReplicatedStorage:WaitForChild("UpdateHighscoreEvent", 10)
+	end
+end
+
+RemoteEvents.UpdateHighscore = updateHighscoreEvent
+
 return RemoteEvents

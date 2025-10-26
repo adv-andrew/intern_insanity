@@ -2,10 +2,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local TaskManager = require(script.TaskManager)
+local DataStore = require(script.DataStoreService)
 
 -- Wait for shared modules
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
+
+-- Initialize DataStore system
+DataStore.init()
 
 local gameStarted = false
 

@@ -11,6 +11,7 @@ local FadeController = require(script.FadeController)
 local RoomDetection = require(script.RoomDetection)
 local CoinDisplay = require(script.CoinDisplay)
 local TimeDisplay = require(script.TimeDisplay)
+local HighscoreDisplay = require(script.HighscoreDisplay)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -128,6 +129,9 @@ startButton.Activated:Connect(function()
 
     -- Start the time display
     TimeDisplay.start()
+
+    -- Start the highscore display
+    HighscoreDisplay.start()
 
     -- Start the task system
     task.spawn(function()

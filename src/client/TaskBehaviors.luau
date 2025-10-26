@@ -386,6 +386,10 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                 end)
                 print("[TaskBehaviors] Fade transition complete")
 
+                -- Update highscore at end of round (WIN)
+                RemoteEvents.UpdateHighscore:FireServer()
+                print("[TaskBehaviors] Sent highscore update request (WIN)")
+
                 -- Complete the task after cutscene
                 if bossTaskCompletionCallback then
                     bossTaskCompletionCallback()
@@ -498,6 +502,10 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                     end
                 end)
                 print("[TaskBehaviors] Fade transition complete")
+
+                -- Update highscore at end of round (LOSE)
+                RemoteEvents.UpdateHighscore:FireServer()
+                print("[TaskBehaviors] Sent highscore update request (LOSE)")
 
                 -- Complete the task after cutscene
                 if bossTaskCompletionCallback then
