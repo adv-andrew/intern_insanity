@@ -7,6 +7,7 @@ local Workspace = game:GetService("Workspace")
 
 local ServerTaskMinigame = require(script.Parent.ServerTaskMinigame)
 local FadeController = require(script.Parent.FadeController)
+local SpeechBubble = require(script.Parent.SpeechBubble)
 
 local TaskBehaviors = {}
 
@@ -115,6 +116,7 @@ function TaskBehaviors.handleCoworkerConflictInteraction(objectPath: string, cur
                         FadeController.redFlash()
                         if TaskManager then
                             TaskManager.reduceCurrentTaskTime(20) -- Lose 20% of remaining time
+                            TaskManager.markPlayerFailed() -- Mark as failed for wrong answer
                         end
                     end)
                 end
@@ -145,6 +147,7 @@ function TaskBehaviors.handleCoworkerConflictInteraction(objectPath: string, cur
                         FadeController.redFlash()
                         if TaskManager then
                             TaskManager.reduceCurrentTaskTime(20) -- Lose 20% of remaining time
+                            TaskManager.markPlayerFailed() -- Mark as failed for wrong answer
                         end
                     end)
                 end
@@ -230,6 +233,7 @@ function TaskBehaviors.handleFixBugQuizInteraction(objectPath: string, currentOb
                                 FadeController.redFlash()
                                 if TaskManager then
                                     TaskManager.reduceCurrentTaskTime(20) -- Lose 20% of remaining time
+                                    TaskManager.markPlayerFailed() -- Mark as failed for wrong answer
                                 end
                             end)
                         end
@@ -249,25 +253,53 @@ end
 
 -- Handle TalkToBoss task interactions
 function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentObjectiveIndex: number, completionCallback)
-    if objectPath == "Manager.Boss" and currentObjectiveIndex == 1 then
-        -- Open the BossTask GUI
-        local playerGui = player:WaitForChild("PlayerGui")
-        local mainGui = playerGui:WaitForChild("MainGui")
-        local bossTask = mainGui:FindFirstChild("BossTask")
-
-        if bossTask then
-            bossTask.Visible = true
-            print("[TaskBehaviors] BossTask GUI opened")
-
-            -- Store the completion callback
-            bossTaskCompletionCallback = completionCallback
-
-            -- Task is not completed yet - waiting for player interaction with GUI
-            return false
-        else
-            warn("[TaskBehaviors] BossTask GUI not found!")
+    if objectPath == "BossRoom.Boss" and currentObjectiveIndex == 1 then
+        -- Find the Boss NPC in BossRoom
+        local bossRoom = Workspace:FindFirstChild("BossRoom")
+        if not bossRoom then
+            warn("[TaskBehaviors] BossRoom not found in Workspace")
             return false
         end
+
+        local boss = bossRoom:FindFirstChild("Boss")
+        if not boss then
+            warn("[TaskBehaviors] Boss not found in BossRoom")
+            return false
+        end
+
+        -- Check if player passed or failed
+        local playerPassed = TaskManager and TaskManager.hasPlayerPassed() or true
+
+        -- Show speech bubble sequence based on pass/fail
+        task.spawn(function()
+            if playerPassed then
+                -- Player passed - return offer
+                SpeechBubble.showSequence(boss, {
+                    "HEY INTERN!",
+                    "BASED ON YOUR PERFORMANCE...",
+                    "I WILL GIVE YOU A RETURN OFFER!"
+                }, 2.5)
+            else
+                -- Player failed - fired
+                SpeechBubble.showSequence(boss, {
+                    "HEY INTERN!",
+                    "BASED ON YOUR PERFORMANCE...",
+                    "YOU'RE FIRED!"
+                }, 2.5)
+            end
+
+            -- Wait for speech bubbles to finish (3 messages * 2.5 seconds each)
+            task.wait(7.5)
+
+            -- Complete the task
+            if bossTaskCompletionCallback then
+                bossTaskCompletionCallback()
+                bossTaskCompletionCallback = nil
+            end
+        end)
+
+        -- Task is not completed yet - waiting for speech bubbles to finish
+        return false
     end
     return false
 end

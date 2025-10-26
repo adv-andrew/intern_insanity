@@ -24,6 +24,7 @@ local allTaskFrames = {} -- Store all task frames for unselecting
 local taskFrameToData = {} -- Map task frames to their task data
 local taskFrameToTimeState = {} -- Map task frames to their time state
 local currentObjectiveIndex = 1 -- Track which objective the player is on
+local playerPassed = true -- Track if player has passed all tasks (fails if any wrong answer)
 
 -- Colors
 local SELECTED_COLOR = Color3.fromRGB(52, 152, 219) -- Blue
@@ -291,6 +292,17 @@ function TaskManager.reduceCurrentTaskTime(percentage: number)
             timeState.timeRemaining = math.max(0, timeState.timeRemaining - reduction)
         end
     end
+end
+
+-- Mark player as failed (called when wrong answer is selected)
+function TaskManager.markPlayerFailed()
+    playerPassed = false
+    print("[TaskManager] Player marked as FAILED")
+end
+
+-- Get whether player has passed
+function TaskManager.hasPlayerPassed(): boolean
+    return playerPassed
 end
 
 return TaskManager
