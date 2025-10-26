@@ -179,7 +179,11 @@ TaskRegistry.Tasks = {
         timeToComplete = 50,
         category = "TechTasks",
         objectives = {
-            { description = "Go to Office and fix the code", room = "Office" },
+            {
+                description = "Go to Office and fix the code",
+                room = "Office",
+                objectModel = "Office.PlayerDesk",
+            },
         },
     } :: Task,
 }

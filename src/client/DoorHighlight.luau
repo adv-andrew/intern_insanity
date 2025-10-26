@@ -274,6 +274,21 @@ local function highlightObject(objectPath: string)
                         -- Complete the objective immediately (won't happen - task waits for choice)
                         TaskManager.completeObjective()
                     end
+                elseif taskData and taskData.id == "FixBugQuiz" then
+                    -- Pass a completion callback for when the player fixes the bug
+                    local success = TaskBehaviors.handleFixBugQuizInteraction(
+                        objectPath,
+                        objectiveIndex,
+                        function()
+                            -- Called when player completes the bug fix
+                            TaskManager.completeObjective()
+                        end
+                    )
+
+                    if success then
+                        -- Complete the objective immediately (won't happen - task waits for bug fix)
+                        TaskManager.completeObjective()
+                    end
                 end
             end
         end)

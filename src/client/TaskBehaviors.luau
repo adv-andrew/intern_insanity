@@ -27,6 +27,9 @@ local awsTaskCompletionCallback = nil
 -- CoworkerConflict task state
 local coworkerTaskCompletionCallback = nil
 
+-- FixBugQuiz task state
+local bugTaskCompletionCallback = nil
+
 -- Handle PrinterJam task interactions
 function TaskBehaviors.handlePrinterJamInteraction(objectPath: string, currentObjectiveIndex: number)
     if objectPath == "Conference.PaperStack" and currentObjectiveIndex == 1 then
@@ -148,6 +151,30 @@ function TaskBehaviors.handleCoworkerConflictInteraction(objectPath: string, cur
             return false
         else
             warn("[TaskBehaviors] CoworkerTask GUI not found!")
+            return false
+        end
+    end
+    return false
+end
+
+-- Handle FixBugQuiz task interactions
+function TaskBehaviors.handleFixBugQuizInteraction(objectPath: string, currentObjectiveIndex: number, completionCallback)
+    if objectPath == "Office.PlayerDesk" and currentObjectiveIndex == 1 then
+        -- Open the BugTask GUI
+        local playerGui = player:WaitForChild("PlayerGui")
+        local mainGui = playerGui:WaitForChild("MainGui")
+        local bugTask = mainGui:FindFirstChild("BugTask")
+
+        if bugTask then
+            bugTask.Visible = true
+
+            -- Store the completion callback
+            bugTaskCompletionCallback = completionCallback
+
+            -- Task is not completed yet - waiting for player to fix the bug
+            return false
+        else
+            warn("[TaskBehaviors] BugTask GUI not found!")
             return false
         end
     end
