@@ -358,7 +358,7 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                                     end
 
                                     local anim = Instance.new("Animation")
-                                    anim.AnimationId = "rbxassetid://161099825"
+                                    anim.AnimationId = "rbxassetid://507770239"
                                     local animationTrack = animator:LoadAnimation(anim)
                                     animationTrack:Play()
                                     print("[TaskBehaviors] Playing winning animation on Intern NPC")
