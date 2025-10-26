@@ -205,6 +205,77 @@ function FadeController.redFlash()
     end
 end
 
+-- Fade to black with callback at midpoint, then fade back
+function FadeController.fadeToBlackWithCallback(midpointCallback: () -> ())
+    print("[FadeController] fadeToBlackWithCallback called")
+    local fadeGui = playerGui:FindFirstChild("FadeGui")
+    if not fadeGui then
+        warn("[FadeController] FadeGui not found in PlayerGui")
+        -- Print all children for debugging
+        print("[FadeController] PlayerGui children:", playerGui:GetChildren())
+        return
+    end
+
+    print("[FadeController] FadeGui found")
+    local fadeBackground = fadeGui:FindFirstChild("FadeBackground")
+    if not fadeBackground then
+        warn("[FadeController] FadeBackground not found in FadeGui")
+        -- Print all children for debugging
+        print("[FadeController] FadeGui children:", fadeGui:GetChildren())
+        return
+    end
+
+    print("[FadeController] FadeBackground found, starting fade")
+
+    -- Tween info for fade in (1 second to black)
+    local fadeInInfo = TweenInfo.new(
+        1, -- Duration
+        Enum.EasingStyle.Sine,
+        Enum.EasingDirection.InOut
+    )
+
+    -- Tween info for fade out (1 second back to transparent)
+    local fadeOutInfo = TweenInfo.new(
+        1, -- Duration
+        Enum.EasingStyle.Sine,
+        Enum.EasingDirection.InOut
+    )
+
+    -- Ensure starting transparency
+    print("[FadeController] Starting transparency:", fadeBackground.BackgroundTransparency)
+
+    -- Fade in (transparent to opaque)
+    local fadeInTween = TweenService:Create(
+        fadeBackground,
+        fadeInInfo,
+        { BackgroundTransparency = 0 }
+    )
+
+    print("[FadeController] Playing fade IN tween (to black)")
+    fadeInTween:Play()
+    fadeInTween.Completed:Wait()
+    print("[FadeController] Fade IN complete - screen should be black now")
+
+    -- At midpoint - call the callback (e.g., switch camera)
+    if midpointCallback then
+        print("[FadeController] Calling midpoint callback")
+        midpointCallback()
+        print("[FadeController] Midpoint callback complete")
+    end
+
+    -- Fade out (opaque to transparent)
+    local fadeOutTween = TweenService:Create(
+        fadeBackground,
+        fadeOutInfo,
+        { BackgroundTransparency = 1 }
+    )
+
+    print("[FadeController] Playing fade OUT tween (to transparent)")
+    fadeOutTween:Play()
+    fadeOutTween.Completed:Wait()
+    print("[FadeController] Fade OUT complete - transition finished")
+end
+
 -- Listen for door teleport events from server
 function FadeController.start()
     RemoteEvents.DoorTeleport.OnClientEvent:Connect(function(destinationCFrame)

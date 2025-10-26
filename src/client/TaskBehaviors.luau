@@ -253,7 +253,10 @@ end
 
 -- Handle TalkToBoss task interactions
 function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentObjectiveIndex: number, completionCallback)
+    print("[TaskBehaviors] handleTalkToBossInteraction called with objectPath:", objectPath, "objectiveIndex:", currentObjectiveIndex)
+
     if objectPath == "BossRoom.Boss" and currentObjectiveIndex == 1 then
+        print("[TaskBehaviors] Matched BossRoom.Boss interaction")
         -- Find the Boss NPC in BossRoom
         local bossRoom = Workspace:FindFirstChild("BossRoom")
         if not bossRoom then
@@ -279,28 +282,74 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
         -- Show speech bubble sequence based on pass/fail
         task.spawn(function()
             if playerPassed then
+                print("[TaskBehaviors] Player PASSED - showing success sequence")
                 -- Player passed - return offer
                 SpeechBubble.showSequence(boss, {
                     "HEY INTERN!",
                     "BASED ON YOUR PERFORMANCE...",
                     "I WILL GIVE YOU A RETURN OFFER!"
                 }, 2.5)
+
+                -- Wait for speech bubbles to finish (3 messages * 2.5 seconds each)
+                task.wait(7.5)
+
+                -- Complete the task
+                if bossTaskCompletionCallback then
+                    bossTaskCompletionCallback()
+                    bossTaskCompletionCallback = nil
+                end
             else
+                print("[TaskBehaviors] Player FAILED - showing fired sequence")
                 -- Player failed - fired
                 SpeechBubble.showSequence(boss, {
                     "HEY INTERN!",
                     "BASED ON YOUR PERFORMANCE...",
                     "YOU'RE FIRED!"
                 }, 2.5)
-            end
 
-            -- Wait for speech bubbles to finish (3 messages * 2.5 seconds each)
-            task.wait(7.5)
+                print("[TaskBehaviors] Speech bubbles started, waiting 7.5 seconds...")
+                -- Wait for speech bubbles to finish (3 messages * 2.5 seconds each)
+                task.wait(7.5)
 
-            -- Complete the task
-            if bossTaskCompletionCallback then
-                bossTaskCompletionCallback()
-                bossTaskCompletionCallback = nil
+                print("[TaskBehaviors] Speech bubbles finished, waiting 5 more seconds...")
+                -- Wait 5 more seconds after "YOU'RE FIRED"
+                task.wait(5)
+                print("[TaskBehaviors] 5 second wait complete, starting cutscene...")
+
+                -- Trigger fade to black with camera switch at midpoint
+                print("[TaskBehaviors] Starting fade transition...")
+                FadeController.fadeToBlackWithCallback(function()
+                    print("[TaskBehaviors] Fade midpoint reached - switching camera")
+
+                    -- At midpoint (screen is fully black), switch camera to cutscene
+                    local cutscenePart = Workspace:FindFirstChild("CutscenePart")
+                    if not cutscenePart then
+                        warn("[TaskBehaviors] CutscenePart not found in Workspace")
+                        return
+                    end
+
+                    print("[TaskBehaviors] Found CutscenePart at:", cutscenePart.CFrame)
+
+                    -- Set player's camera to scriptable mode and position it
+                    local currentCamera = Workspace.CurrentCamera
+                    if currentCamera then
+                        print("[TaskBehaviors] Setting camera type to Scriptable")
+                        currentCamera.CameraType = Enum.CameraType.Scriptable
+                        currentCamera.CFrame = cutscenePart.CFrame
+                        print("[TaskBehaviors] Camera CFrame set to:", currentCamera.CFrame)
+                    else
+                        warn("[TaskBehaviors] CurrentCamera not found")
+                    end
+
+                    print("[TaskBehaviors] Switched camera to CutscenePart")
+                end)
+                print("[TaskBehaviors] Fade transition complete")
+
+                -- Complete the task after cutscene
+                if bossTaskCompletionCallback then
+                    bossTaskCompletionCallback()
+                    bossTaskCompletionCallback = nil
+                end
             end
         end)
 
