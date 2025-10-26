@@ -352,8 +352,13 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                                         animator.Parent = humanoid
                                     end
 
+                                    -- Stop all currently playing animations
+                                    for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+                                        track:Stop()
+                                    end
+
                                     local anim = Instance.new("Animation")
-                                    anim.AnimationId = "rbxassetid://3716636630"
+                                    anim.AnimationId = "rbxassetid://161099825"
                                     local animationTrack = animator:LoadAnimation(anim)
                                     animationTrack:Play()
                                     print("[TaskBehaviors] Playing winning animation on Intern NPC")
@@ -458,6 +463,11 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                                     if not animator then
                                         animator = Instance.new("Animator")
                                         animator.Parent = humanoid
+                                    end
+
+                                    -- Stop all currently playing animations
+                                    for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+                                        track:Stop()
                                     end
 
                                     local anim = Instance.new("Animation")

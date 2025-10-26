@@ -45,6 +45,40 @@ if cutscenePart then
     camera.CFrame = cutscenePart.CFrame * CFrame.new(0, 0, 10)
 
     print("[Init] Camera set to CutscenePart view at position:", cutscenePart.CFrame.Position)
+
+    -- Play animation on Intern during beginning cutscene
+    local cutsceneArea = Workspace:FindFirstChild("CutsceneArea")
+    if cutsceneArea then
+        local intern = cutsceneArea:FindFirstChild("Intern")
+        if intern and intern:IsA("Model") then
+            local humanoid = intern:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                local success, err = pcall(function()
+                    local animator = humanoid:FindFirstChildOfClass("Animator")
+                    if not animator then
+                        animator = Instance.new("Animator")
+                        animator.Parent = humanoid
+                    end
+
+                    local anim = Instance.new("Animation")
+                    anim.AnimationId = "rbxassetid://507770239"
+                    local animationTrack = animator:LoadAnimation(anim)
+                    animationTrack.Looped = true
+                    animationTrack:Play()
+                    print("[Init] Playing beginning cutscene animation on Intern NPC")
+                end)
+                if not success then
+                    warn("[Init] Failed to load beginning cutscene animation:", err)
+                end
+            else
+                warn("[Init] Intern has no Humanoid")
+            end
+        else
+            warn("[Init] Intern not found in CutsceneArea")
+        end
+    else
+        warn("[Init] CutsceneArea not found in Workspace")
+    end
 else
     warn("[Init] CutscenePart not found in Workspace")
 end
