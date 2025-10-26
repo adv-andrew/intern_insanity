@@ -119,7 +119,7 @@ TaskRegistry.Tasks = {
     PrinterJam = {
         id = "PrinterJam",
         name = "Printer Jam",
-        description = "Fix the jammed printer before the boss notices",
+        description = "Printer jammed",
         emoji = "🖨️",
         timeToComplete = 40,
         category = "OfficeMovement",
@@ -130,7 +130,7 @@ TaskRegistry.Tasks = {
                 objectModel = "Conference.PaperStack",
             },
             {
-                description = "Deliver paper to Office printer",
+                description = "Load paper in the printer",
                 room = "Office",
                 objectModel = "Office.Printer",
             },
@@ -140,13 +140,13 @@ TaskRegistry.Tasks = {
     AWSOutage = {
         id = "AWSOutage",
         name = "AWS Outage: Servers on Fire",
-        description = "The servers are down! Fix it before anyone notices",
+        description = "The AWS servers are down!",
         emoji = "🔥",
         timeToComplete = 45,
         category = "TechTasks",
         objectives = {
             {
-                description = "Go to Server room and reboot servers",
+                description = "FIX THE AWS OUTAGE!!!!",
                 room = "Server",
                 objectModel = "ServerRoom.ServerMain",
             },
@@ -157,7 +157,7 @@ TaskRegistry.Tasks = {
         CoworkerConflict = {
             id = "CoworkerConflict",
             name = "Coworker Conflict",
-            description = "Two coworkers are arguing. Pick a side or stay neutral",
+            description = "Two coworkers are arguing. Settle their argument",
             emoji = "😠",
             timeToComplete = 35,
             category = "SocialTasks",
@@ -174,13 +174,13 @@ TaskRegistry.Tasks = {
     FixBugQuiz = {
         id = "FixBugQuiz",
         name = "Fix Bug Quiz",
-        description = "Debug this code and prove your coding skills",
+        description = "Complete Code Review",
         emoji = "🐛",
         timeToComplete = 50,
         category = "TechTasks",
         objectives = {
             {
-                description = "Go to Office and fix the code",
+                description = "Fix your code!",
                 room = "Office",
                 objectModel = "Office.PlayerDesk",
             },
@@ -190,13 +190,13 @@ TaskRegistry.Tasks = {
     TalkToBoss = {
         id = "TalkToBoss",
         name = "Talk to Boss",
-        description = "The boss wants to see you in the manager room",
+        description = "Talk To Boss",
         emoji = "👔",
         timeToComplete = 60,
         category = "SocialTasks",
         objectives = {
             {
-                description = "Go to Manager room and talk to the boss",
+                description = "The boss wants to see you in the manager room",
                 room = "Manager",
                 objectModel = "BossRoom.Boss",
             },
