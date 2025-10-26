@@ -11,7 +11,7 @@ local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
 local TaskManager = {}
 
 -- Configuration
-local TASK_SPAWN_INTERVAL = 5 -- seconds between task spawns
+local TASK_SPAWN_INTERVAL = 10 -- seconds between task spawns
 
 -- Level 1 hardcoded task sequence (first 4 tasks spawn on timer, 5th spawns on completion)
 local LEVEL_1_TASKS = {

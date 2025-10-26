@@ -186,9 +186,9 @@ local function spawnTask(taskData: TaskRegistry.Task)
     table.insert(allTaskFrames, newTask)
     taskFrameToData[newTask] = taskData
 
-    -- Auto-select if this is the first task and no task is currently selected
+    -- Auto-select if no task is currently selected
     -- OR if this is the TalkToBoss task (see manager)
-    if (currentTaskCount == 1 and not selectedTask) or taskData.id == "TalkToBoss" then
+    if (not selectedTask) or taskData.id == "TalkToBoss" then
         autoSelectTask(newTask, taskData)
     end
 
