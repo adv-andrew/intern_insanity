@@ -23,13 +23,13 @@ local function applySpeakerAnimation()
         return
     end
 
-    -- Apply animation to both Speaker1 and Speaker2
-    local speakers = {"Speaker1", "Speaker2", "Speaker3"}
-
-    for _, speakerName in ipairs(speakers) do
-        local speaker = npcs:FindFirstChild(speakerName)
-        if speaker then
-            if speaker:IsA("Model") then
+    -- Apply animation to Speaker1 and Speaker2 inside CoWorkers model, and Speaker3
+    local coWorkers = npcs:FindFirstChild("CoWorkers")
+    if coWorkers and coWorkers:IsA("Model") then
+        -- Apply to Speaker1 and Speaker2 inside CoWorkers
+        for _, speakerName in ipairs({"Speaker1", "Speaker2"}) do
+            local speaker = coWorkers:FindFirstChild(speakerName)
+            if speaker and speaker:IsA("Model") then
                 local humanoid = speaker:FindFirstChildOfClass("Humanoid")
                 if humanoid then
                     -- Create and load the animation
@@ -40,16 +40,37 @@ local function applySpeakerAnimation()
                     animationTrack.Looped = true
                     animationTrack:Play()
 
-                    print(`Applied animation to {speakerName}`)
+                    print(`Applied animation to {speakerName} (inside CoWorkers)`)
                 else
                     warn(`{speakerName} has no Humanoid`)
                 end
             else
-                warn(`{speakerName} is not a Model`)
+                warn(`{speakerName} not found in CoWorkers`)
             end
-        else
-            warn(`{speakerName} not found in npcs`)
         end
+    else
+        warn("CoWorkers model not found in npcs")
+    end
+
+    -- Apply animation to Speaker3 (same level as CoWorkers)
+    local speaker3 = npcs:FindFirstChild("Speaker3")
+    if speaker3 and speaker3:IsA("Model") then
+        local humanoid = speaker3:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            -- Create and load the animation
+            local anim = Instance.new("Animation")
+            anim.AnimationId = SPEAKER_ANIMATION_ID
+
+            local animationTrack = humanoid:LoadAnimation(anim)
+            animationTrack.Looped = true
+            animationTrack:Play()
+
+            print(`Applied animation to Speaker3`)
+        else
+            warn("Speaker3 has no Humanoid")
+        end
+    else
+        warn("Speaker3 not found in npcs")
     end
 end
 
