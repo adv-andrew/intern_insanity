@@ -368,7 +368,7 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
 
                 print("[TaskBehaviors] Speech bubbles finished, waiting 5 more seconds...")
                 -- Wait 5 more seconds after "YOU'RE FIRED"
-                
+
                 print("[TaskBehaviors] 5 second wait complete, starting cutscene...")
 
                 -- Trigger fade to black with camera switch at midpoint
@@ -412,6 +412,28 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                     print("[TaskBehaviors] CutscenePart Position:", cutscenePart.CFrame.Position)
 
                     print("[TaskBehaviors] Switched camera to CutscenePart")
+
+                    -- Apply animation to Intern NPC in cutscene
+                    local cutsceneArea = Workspace:FindFirstChild("CutsceneArea")
+                    if cutsceneArea then
+                        local intern = cutsceneArea:FindFirstChild("Intern")
+                        if intern and intern:IsA("Model") then
+                            local humanoid = intern:FindFirstChildOfClass("Humanoid")
+                            if humanoid then
+                                local anim = Instance.new("Animation")
+                                anim.AnimationId = "rbxassetid://96518341091970"
+                                local animationTrack = humanoid:LoadAnimation(anim)
+                                animationTrack:Play()
+                                print("[TaskBehaviors] Playing animation on Intern NPC")
+                            else
+                                warn("[TaskBehaviors] Intern has no Humanoid")
+                            end
+                        else
+                            warn("[TaskBehaviors] Intern not found in CutsceneArea")
+                        end
+                    else
+                        warn("[TaskBehaviors] CutsceneArea not found in Workspace")
+                    end
 
                     -- Disable MainGui
                     local playerGui = player:WaitForChild("PlayerGui")
