@@ -14,14 +14,17 @@ local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
 
 local FadeController = {}
 
--- Get fade GUI elements
-local fadeGui = playerGui:WaitForChild("FadeGui")
-local greenFadeBackground = fadeGui:WaitForChild("GreenFadeBackground")
-
 -- Fade the screen to black and then back
 function FadeController.fadeTransition()
-    local fadeGui = playerGui:WaitForChild("FadeGui")
-    local fadeBackground = fadeGui:WaitForChild("FadeBackground")
+    local fadeGui = playerGui:FindFirstChild("FadeGui")
+    if not fadeGui then
+        return
+    end
+
+    local fadeBackground = fadeGui:FindFirstChild("FadeBackground")
+    if not fadeBackground then
+        return
+    end
 
     -- Tween info for fade in (0.5 seconds)
     local fadeInInfo = TweenInfo.new(
@@ -61,6 +64,17 @@ end
 
 -- Green fade animation for task completion
 function FadeController.greenFlash()
+    -- Get GreenFadeBackground when needed
+    local fadeGui = playerGui:FindFirstChild("FadeGui")
+    if not fadeGui then
+        return
+    end
+
+    local greenFadeBackground = fadeGui:FindFirstChild("GreenFadeBackground")
+    if not greenFadeBackground then
+        return
+    end
+
     -- Tween info for fade in and out (0.5 seconds each)
     local fadeInInfo = TweenInfo.new(
         0.5, -- Duration
@@ -76,6 +90,78 @@ function FadeController.greenFlash()
 
     -- Get all children of GreenFadeBackground
     local children = greenFadeBackground:GetChildren()
+    local fadeInTweens = {}
+    local fadeOutTweens = {}
+
+    -- Create tweens for all children
+    for _, child in ipairs(children) do
+        if child:IsA("Frame") or child:IsA("GuiObject") then
+            -- Ensure starting at transparent
+            child.BackgroundTransparency = 1
+
+            -- Fade in tween (1 -> 0)
+            local fadeIn = TweenService:Create(
+                child,
+                fadeInInfo,
+                { BackgroundTransparency = 0 }
+            )
+            table.insert(fadeInTweens, fadeIn)
+
+            -- Fade out tween (0 -> 1)
+            local fadeOut = TweenService:Create(
+                child,
+                fadeOutInfo,
+                { BackgroundTransparency = 1 }
+            )
+            table.insert(fadeOutTweens, fadeOut)
+        end
+    end
+
+    -- Play all fade in tweens
+    for _, tween in ipairs(fadeInTweens) do
+        tween:Play()
+    end
+
+    -- Wait for first tween to complete
+    if #fadeInTweens > 0 then
+        fadeInTweens[1].Completed:Wait()
+    end
+
+    -- Play all fade out tweens
+    for _, tween in ipairs(fadeOutTweens) do
+        tween:Play()
+    end
+end
+
+-- Red fade animation for task failure
+function FadeController.redFlash()
+    -- Get FadeGui when needed
+    local fadeGui = playerGui:FindFirstChild("FadeGui")
+    if not fadeGui then
+        return
+    end
+
+    -- Get RedFadeBackground when needed
+    local redFadeBackground = fadeGui:FindFirstChild("RedFadeBackground")
+    if not redFadeBackground then
+        return
+    end
+
+    -- Tween info for fade in and out (0.5 seconds each)
+    local fadeInInfo = TweenInfo.new(
+        0.5, -- Duration
+        Enum.EasingStyle.Sine,
+        Enum.EasingDirection.InOut
+    )
+
+    local fadeOutInfo = TweenInfo.new(
+        0.5, -- Duration
+        Enum.EasingStyle.Sine,
+        Enum.EasingDirection.InOut
+    )
+
+    -- Get all children of RedFadeBackground
+    local children = redFadeBackground:GetChildren()
     local fadeInTweens = {}
     local fadeOutTweens = {}
 

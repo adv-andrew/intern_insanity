@@ -22,6 +22,7 @@ local selectedTask = nil -- Track currently selected task
 local selectedTaskData = nil -- Track the task data of selected task
 local allTaskFrames = {} -- Store all task frames for unselecting
 local taskFrameToData = {} -- Map task frames to their task data
+local taskFrameToTimeState = {} -- Map task frames to their time state
 local currentObjectiveIndex = 1 -- Track which objective the player is on
 
 -- Colors
@@ -108,6 +109,7 @@ function TaskManager.completeObjective()
                 end
             end
             taskFrameToData[completedTask] = nil
+            taskFrameToTimeState[completedTask] = nil
         end
 
         selectedTask = nil
@@ -191,8 +193,11 @@ local function spawnTask(taskData: TaskRegistry.Task)
     end
 
     -- Start the timer for this task
-    local timeRemaining = taskData.timeToComplete
-    local totalTime = taskData.timeToComplete
+    local timeState = {
+        timeRemaining = taskData.timeToComplete,
+        totalTime = taskData.timeToComplete
+    }
+    taskFrameToTimeState[newTask] = timeState
 
     task.spawn(function()
         local timeBar = newTask:FindFirstChild("TimeBar")
@@ -203,13 +208,13 @@ local function spawnTask(taskData: TaskRegistry.Task)
         local yellowColor = Color3.fromRGB(241, 196, 15) -- Yellow
         local redColor = Color3.fromRGB(231, 76, 60) -- Red
 
-        while timeRemaining > 0 do
+        while timeState.timeRemaining > 0 do
             task.wait(0.1) -- Update every 0.1 seconds
-            timeRemaining = timeRemaining - 0.1
+            timeState.timeRemaining = timeState.timeRemaining - 0.1
 
             if bar then
                 -- Update bar size based on time remaining
-                local progress = math.max(0, timeRemaining / totalTime)
+                local progress = math.max(0, timeState.timeRemaining / timeState.totalTime)
                 bar.Size = UDim2.new(progress, 0, 1, 0)
 
                 -- Update bar color based on progress
@@ -238,8 +243,9 @@ end
 
 -- Start listening for server task spawns
 function TaskManager.start()
-    -- Set TaskManager reference in DoorHighlight to avoid circular dependency
+    -- Set TaskManager reference in DoorHighlight and TaskBehaviors to avoid circular dependency
     DoorHighlight.setTaskManager(TaskManager)
+    TaskBehaviors.setTaskManager(TaskManager)
 
     -- Listen for task spawn events from server
     RemoteEvents.SpawnTask.OnClientEvent:Connect(function(taskData: TaskRegistry.Task)
@@ -268,6 +274,17 @@ end
 -- Get the currently selected task frame
 function TaskManager.getSelectedTask()
     return selectedTask
+end
+
+-- Reduce time on the currently selected task by a percentage
+function TaskManager.reduceCurrentTaskTime(percentage: number)
+    if selectedTask then
+        local timeState = taskFrameToTimeState[selectedTask]
+        if timeState then
+            local reduction = timeState.timeRemaining * (percentage / 100)
+            timeState.timeRemaining = math.max(0, timeState.timeRemaining - reduction)
+        end
+    end
 end
 
 return TaskManager
