@@ -6,6 +6,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
 local ServerTaskMinigame = require(script.Parent.ServerTaskMinigame)
+local FadeController = require(script.Parent.FadeController)
+local TaskManager = require(script.Parent.TaskManager)
 
 local TaskBehaviors = {}
 
@@ -16,6 +18,9 @@ local hasPapers = false
 
 -- AWSOutage task state
 local awsTaskCompletionCallback = nil
+
+-- CoworkerConflict task state
+local coworkerTaskCompletionCallback = nil
 
 -- Handle PrinterJam task interactions
 function TaskBehaviors.handlePrinterJamInteraction(objectPath: string, currentObjectiveIndex: number)
@@ -73,7 +78,7 @@ function TaskBehaviors.handleAWSOutageInteraction(objectPath: string, currentObj
 end
 
 -- Handle CoworkerConflict task interactions
-function TaskBehaviors.handleCoworkerConflictInteraction(objectPath: string, currentObjectiveIndex: number)
+function TaskBehaviors.handleCoworkerConflictInteraction(objectPath: string, currentObjectiveIndex: number, completionCallback)
     if objectPath == "Office.npcs.CoWorkers" and currentObjectiveIndex == 1 then
         -- Open the CoworkerTask GUI
         local playerGui = player:WaitForChild("PlayerGui")
@@ -82,7 +87,54 @@ function TaskBehaviors.handleCoworkerConflictInteraction(objectPath: string, cur
 
         if coworkerTask then
             coworkerTask.Visible = true
-            print("[TaskBehaviors] CoworkerTask GUI opened")
+
+            -- Store the completion callback
+            coworkerTaskCompletionCallback = completionCallback
+
+            -- Find the A, B, and C choice buttons
+            local choiceA = coworkerTask:FindFirstChild("A")
+            local choiceB = coworkerTask:FindFirstChild("B")
+            local choiceC = coworkerTask:FindFirstChild("C")
+
+            -- Connect choice A (incorrect)
+            if choiceA then
+                local selectButtonA = choiceA:FindFirstChild("SelectButton")
+                if selectButtonA then
+                    selectButtonA.Activated:Connect(function()
+                        FadeController.redFlash()
+                        TaskManager.reduceCurrentTaskTime(20) -- Lose 20% of remaining time
+                    end)
+                end
+            end
+
+            -- Connect choice B (correct)
+            if choiceB then
+                local selectButtonB = choiceB:FindFirstChild("SelectButton")
+                if selectButtonB then
+                    selectButtonB.Activated:Connect(function()
+                        FadeController.greenFlash()
+                        coworkerTask.Visible = false
+
+                        -- Complete task (success)
+                        if coworkerTaskCompletionCallback then
+                            coworkerTaskCompletionCallback()
+                            coworkerTaskCompletionCallback = nil
+                        end
+                    end)
+                end
+            end
+
+            -- Connect choice C (incorrect)
+            if choiceC then
+                local selectButtonC = choiceC:FindFirstChild("SelectButton")
+                if selectButtonC then
+                    selectButtonC.Activated:Connect(function()
+                        FadeController.redFlash()
+                        TaskManager.reduceCurrentTaskTime(20) -- Lose 20% of remaining time
+                    end)
+                end
+            end
+
             -- Task is not completed yet - waiting for player choice
             return false
         else
