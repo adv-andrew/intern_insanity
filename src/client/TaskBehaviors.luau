@@ -72,6 +72,27 @@ function TaskBehaviors.handleAWSOutageInteraction(objectPath: string, currentObj
     return false
 end
 
+-- Handle CoworkerConflict task interactions
+function TaskBehaviors.handleCoworkerConflictInteraction(objectPath: string, currentObjectiveIndex: number)
+    if objectPath == "Office.npcs.CoWorkers" and currentObjectiveIndex == 1 then
+        -- Open the CoworkerTask GUI
+        local playerGui = player:WaitForChild("PlayerGui")
+        local mainGui = playerGui:WaitForChild("MainGui")
+        local coworkerTask = mainGui:FindFirstChild("CoworkerTask")
+
+        if coworkerTask then
+            coworkerTask.Visible = true
+            print("[TaskBehaviors] CoworkerTask GUI opened")
+            -- Task is not completed yet - waiting for player choice
+            return false
+        else
+            warn("[TaskBehaviors] CoworkerTask GUI not found!")
+            return false
+        end
+    end
+    return false
+end
+
 -- Get if player has papers
 function TaskBehaviors.hasPapers(): boolean
     return hasPapers

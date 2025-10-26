@@ -259,6 +259,13 @@ local function highlightObject(objectPath: string)
                         -- Complete the objective immediately
                         TaskManager.completeObjective()
                     end
+                elseif taskData and taskData.id == "CoworkerConflict" then
+                    local success = TaskBehaviors.handleCoworkerConflictInteraction(objectPath, objectiveIndex)
+
+                    if success then
+                        -- Complete the objective
+                        TaskManager.completeObjective()
+                    end
                 end
             end
         end)

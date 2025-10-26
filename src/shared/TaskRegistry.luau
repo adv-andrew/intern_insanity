@@ -162,7 +162,11 @@ TaskRegistry.Tasks = {
             timeToComplete = 35,
             category = "SocialTasks",
             objectives = {
-                { description = "Go talk to your co-workers", room = "Office" },
+                {
+                    description = "Go talk to your co-workers",
+                    room = "Office",
+                    objectModel = "Office.npcs.CoWorkers",
+                },
             },
         } :: Task,
     
