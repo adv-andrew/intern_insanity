@@ -260,18 +260,10 @@ local function highlightObject(objectPath: string)
                         TaskManager.completeObjective()
                     end
                 elseif taskData and taskData.id == "CoworkerConflict" then
-                    -- Pass a completion callback for when the player makes a choice
-                    local success = TaskBehaviors.handleCoworkerConflictInteraction(
-                        objectPath,
-                        objectiveIndex,
-                        function()
-                            -- Called when player selects A, B, or C
-                            TaskManager.completeObjective()
-                        end
-                    )
+                    local success = TaskBehaviors.handleCoworkerConflictInteraction(objectPath, objectiveIndex)
 
                     if success then
-                        -- Complete the objective immediately (won't happen - task waits for choice)
+                        -- Complete the objective
                         TaskManager.completeObjective()
                     end
                 end
