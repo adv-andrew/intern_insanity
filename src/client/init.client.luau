@@ -9,6 +9,7 @@ local CameraController = require(script.CameraController)
 local TaskManager = require(script.TaskManager)
 local FadeController = require(script.FadeController)
 local RoomDetection = require(script.RoomDetection)
+local CoinDisplay = require(script.CoinDisplay)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -106,11 +107,18 @@ startButton.Activated:Connect(function()
     local Shared = ReplicatedStorage:WaitForChild("Shared")
     local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
 
+    -- Reset coins for replayability
+    RemoteEvents.ResetCoins:FireServer()
+    print("[Init] Reset player coins to 0")
+
     -- Signal server that player is ready
     RemoteEvents.PlayerReady:FireServer()
 
     -- Start the top-down camera controller
     CameraController.start()
+
+    -- Start the coin display
+    CoinDisplay.start()
 
     -- Start the task system
     task.spawn(function()

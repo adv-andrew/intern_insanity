@@ -68,4 +68,34 @@ end
 
 RemoteEvents.TaskCompleted = taskCompletedEvent
 
+-- Find or create RemoteEvent for awarding coins
+local awardCoinsEvent = ReplicatedStorage:FindFirstChild("AwardCoinsEvent")
+
+if not awardCoinsEvent then
+	if RunService:IsServer() then
+		awardCoinsEvent = Instance.new("RemoteEvent")
+		awardCoinsEvent.Name = "AwardCoinsEvent"
+		awardCoinsEvent.Parent = ReplicatedStorage
+	else
+		awardCoinsEvent = ReplicatedStorage:WaitForChild("AwardCoinsEvent", 10)
+	end
+end
+
+RemoteEvents.AwardCoins = awardCoinsEvent
+
+-- Find or create RemoteEvent for resetting coins
+local resetCoinsEvent = ReplicatedStorage:FindFirstChild("ResetCoinsEvent")
+
+if not resetCoinsEvent then
+	if RunService:IsServer() then
+		resetCoinsEvent = Instance.new("RemoteEvent")
+		resetCoinsEvent.Name = "ResetCoinsEvent"
+		resetCoinsEvent.Parent = ReplicatedStorage
+	else
+		resetCoinsEvent = ReplicatedStorage:WaitForChild("ResetCoinsEvent", 10)
+	end
+end
+
+RemoteEvents.ResetCoins = resetCoinsEvent
+
 return RemoteEvents

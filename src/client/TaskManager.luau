@@ -102,6 +102,19 @@ function TaskManager.completeObjective()
         -- Store reference to completed task before removing
         local completedTask = selectedTask
 
+        -- Calculate coins based on time remaining
+        local timeState = taskFrameToTimeState[completedTask]
+        if timeState then
+            local timePercentage = timeState.timeRemaining / timeState.totalTime
+            local coinsEarned = math.floor(timePercentage * 100)
+
+            print(`[TaskManager] Time remaining: {math.floor(timeState.timeRemaining)}s / {timeState.totalTime}s ({math.floor(timePercentage * 100)}%)`)
+            print(`[TaskManager] Coins earned: {coinsEarned}`)
+
+            -- Award coins to player
+            RemoteEvents.AwardCoins:FireServer(coinsEarned)
+        end
+
         -- Remove the task frame
         if selectedTask then
             selectedTask:Destroy()
