@@ -13,6 +13,7 @@ local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
 local DoorHighlight = require(script.Parent.DoorHighlight)
 local RoomDetection = require(script.Parent.RoomDetection)
 local TaskBehaviors = require(script.Parent.TaskBehaviors)
+local FadeController = require(script.Parent.FadeController)
 
 local TaskManager = {}
 
@@ -27,6 +28,23 @@ local currentObjectiveIndex = 1 -- Track which objective the player is on
 local SELECTED_COLOR = Color3.fromRGB(52, 152, 219) -- Blue
 local DEFAULT_TASK_COLOR = Color3.fromRGB(255, 255, 255) -- Default dark gray
 local DEFAULT_ICON_COLOR = Color3.fromRGB(255, 255, 255) -- Default icon background
+
+-- Update the objective description UI
+local function updateObjectiveDescription()
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+    local mainGui = playerGui:WaitForChild("MainGui")
+    local descriptionLabel = mainGui:FindFirstChild("Description")
+
+    if descriptionLabel then
+        if selectedTaskData and selectedTaskData.objectives and currentObjectiveIndex <= #selectedTaskData.objectives then
+            local currentObjective = selectedTaskData.objectives[currentObjectiveIndex]
+            descriptionLabel.Text = currentObjective.description
+        else
+            descriptionLabel.Text = ""
+        end
+    end
+end
 
 -- Auto-select a task
 local function autoSelectTask(taskFrame, taskData)
@@ -58,6 +76,9 @@ local function autoSelectTask(taskFrame, taskData)
     else
         DoorHighlight.clear()
     end
+
+    -- Update objective description
+    updateObjectiveDescription()
 end
 
 -- Handle objective completion
@@ -69,6 +90,9 @@ function TaskManager.completeObjective()
     -- Check if this was the last objective
     if currentObjectiveIndex >= #selectedTaskData.objectives then
         print("[TaskManager] Task completed:", selectedTaskData.name)
+
+        -- Play green flash animation
+        FadeController.greenFlash()
 
         -- Store reference to completed task before removing
         local completedTask = selectedTask
@@ -90,6 +114,7 @@ function TaskManager.completeObjective()
         selectedTaskData = nil
         currentObjectiveIndex = 1
         DoorHighlight.clear()
+        updateObjectiveDescription()
 
         -- Auto-select next task if available
         if #allTaskFrames > 0 then
@@ -105,6 +130,7 @@ function TaskManager.completeObjective()
         local nextObjective = selectedTaskData.objectives[currentObjectiveIndex]
         print("[TaskManager] Moving to next objective:", nextObjective.description)
         DoorHighlight.updateHighlight(nextObjective.room, nextObjective.objectModel)
+        updateObjectiveDescription()
     end
 end
 

@@ -162,7 +162,7 @@ TaskRegistry.Tasks = {
             timeToComplete = 35,
             category = "SocialTasks",
             objectives = {
-                { description = "Go to Manager's office to mediate", room = "Manager" },
+                { description = "Go talk to your co-workers", room = "Office" },
             },
         } :: Task,
     
