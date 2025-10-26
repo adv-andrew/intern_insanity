@@ -231,6 +231,10 @@ local function highlightObject(objectPath: string)
         proximityPrompt.Triggered:Connect(function(playerWhoTriggered)
             print("[DoorHighlight] Player interacted with:", objectPath)
 
+            -- Disable proximity prompt immediately to prevent multiple interactions
+            proximityPrompt.Enabled = false
+            print("[DoorHighlight] Proximity prompt disabled")
+
             -- Handle task-specific behavior
             if TaskManager then
                 local taskData = TaskManager.getSelectedTaskData()
