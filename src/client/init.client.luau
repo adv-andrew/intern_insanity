@@ -3,6 +3,7 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
 local CameraController = require(script.CameraController)
 local TaskManager = require(script.TaskManager)
@@ -25,10 +26,43 @@ FadeController.start()
 -- Start room detection
 RoomDetection.start()
 
+-- Set up cutscene camera on player join
+-- Wait for character to load
+local character = player.Character or player.CharacterAdded:Wait()
+print("[Init] Character loaded, setting up cutscene camera")
+
+local cutscenePart = Workspace:WaitForChild("CutscenePart")
+if cutscenePart then
+    print("[Init] Found CutscenePart, switching camera view")
+
+    -- Get the current camera
+    local camera = Workspace.CurrentCamera
+
+    -- Set camera to Scriptable mode so we can control it
+    camera.CameraType = Enum.CameraType.Scriptable
+
+    -- Set camera CFrame to match CutscenePart's CFrame, offset back 10 studs
+    camera.CFrame = cutscenePart.CFrame * CFrame.new(0, 0, 10)
+
+    print("[Init] Camera set to CutscenePart view at position:", cutscenePart.CFrame.Position)
+else
+    warn("[Init] CutscenePart not found in Workspace")
+end
+
 -- Wait for player to click Start button
 startButton.Activated:Connect(function()
     -- Hide start screen
     startScreen.Enabled = false
+
+    -- Switch back to normal player camera
+    print("[Init] Switching from cutscene camera to player camera")
+    local camera = Workspace.CurrentCamera
+    local humanoid = character:WaitForChild("Humanoid")
+
+    -- Reset camera to follow the player
+    camera.CameraType = Enum.CameraType.Custom
+    camera.CameraSubject = humanoid
+    print("[Init] Camera reset to player character")
 
     -- Enable MainGui
     local mainGui = playerGui:WaitForChild("MainGui")
