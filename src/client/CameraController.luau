@@ -12,7 +12,6 @@ local CAMERA_HEIGHT = 18 -- Height above the character
 local CAMERA_ANGLE = 60 -- Angle in degrees (70 = slightly angled top-down)
 
 local currentConnection: RBXScriptConnection? = nil
-local camera = Workspace.CurrentCamera
 
 -- Clean up existing camera connection
 local function cleanup()
@@ -26,8 +25,16 @@ end
 local function setupCamera(character: Model)
     cleanup()
 
+    -- Get current camera (fresh reference in case it was replaced)
+    local camera = Workspace.CurrentCamera
+    if not camera then
+        warn("[CameraController] CurrentCamera not found")
+        return
+    end
+
     -- Lock camera to Scriptable mode (prevents player control)
     camera.CameraType = Enum.CameraType.Scriptable
+    print("[CameraController] Camera set to Scriptable mode")
 
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart") :: BasePart
 
@@ -35,6 +42,12 @@ local function setupCamera(character: Model)
     currentConnection = RunService.RenderStepped:Connect(function()
         if not character or not character.Parent then
             cleanup()
+            return
+        end
+
+        -- Get current camera each frame (in case it changes)
+        local currentCamera = Workspace.CurrentCamera
+        if not currentCamera then
             return
         end
 
@@ -46,7 +59,7 @@ local function setupCamera(character: Model)
 
         -- Position camera above and behind the character
         local cameraOffset = Vector3.new(0, CAMERA_HEIGHT, horizontalDist)
-        camera.CFrame = CFrame.new(rootPosition + cameraOffset, rootPosition)
+        currentCamera.CFrame = CFrame.new(rootPosition + cameraOffset, rootPosition)
     end)
 end
 
@@ -73,7 +86,10 @@ end
 -- Stop the camera controller and restore default camera
 function CameraController.stop()
     cleanup()
-    camera.CameraType = Enum.CameraType.Custom
+    local camera = Workspace.CurrentCamera
+    if camera then
+        camera.CameraType = Enum.CameraType.Custom
+    end
 end
 
 return CameraController
