@@ -14,7 +14,7 @@ local playerGui = player:WaitForChild("PlayerGui")
 
 -- Wait for Start screen
 local startScreen = playerGui:WaitForChild("Start")
-local startButton = startScreen:WaitForChild("StartButton")
+local startButton = startScreen:WaitForChild("Button"):WaitForChild("Top"):WaitForChild("Button")
 
 -- Enable the Start screen when player loads in
 startScreen.Enabled = true
