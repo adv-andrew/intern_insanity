@@ -3,7 +3,6 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
 
 local CameraController = require(script.CameraController)
 local TaskManager = require(script.TaskManager)
@@ -20,23 +19,6 @@ local startButton = startScreen:WaitForChild("StartButton")
 -- Enable the Start screen when player loads in
 startScreen.Enabled = true
 
--- Set camera to cutscene view on game start
-local cutscenePart = Workspace:WaitForChild("CutscenePart", 10)
-if cutscenePart then
-    -- Create opening cutscene camera
-    local openingCamera = Instance.new("Camera")
-    openingCamera.Name = "OpeningCutsceneCamera"
-    openingCamera.CFrame = cutscenePart.CFrame
-    openingCamera.Focus = CFrame.new(cutscenePart.Position)
-    openingCamera.Parent = cutscenePart
-
-    -- Set as current camera
-    Workspace.CurrentCamera = openingCamera
-    print("[Client Init] Opening cutscene camera set")
-else
-    warn("[Client Init] CutscenePart not found - skipping opening cutscene")
-end
-
 -- Start the fade controller (listens for teleport events)
 FadeController.start()
 
@@ -45,34 +27,25 @@ RoomDetection.start()
 
 -- Wait for player to click Start button
 startButton.Activated:Connect(function()
-    print("[Client Init] Start button clicked - starting fade transition")
+    -- Hide start screen
+    startScreen.Enabled = false
 
-    -- Fade to black, switch camera at midpoint, then fade back
-    FadeController.fadeToBlackWithCallback(function()
-        print("[Client Init] Fade midpoint - switching to gameplay camera")
+    -- Enable MainGui
+    local mainGui = playerGui:WaitForChild("MainGui")
+    mainGui.Enabled = true
 
-        -- Hide start screen
-        startScreen.Enabled = false
+    -- Get RemoteEvents
+    local Shared = ReplicatedStorage:WaitForChild("Shared")
+    local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
 
-        -- Enable MainGui
-        local mainGui = playerGui:WaitForChild("MainGui")
-        mainGui.Enabled = true
+    -- Signal server that player is ready
+    RemoteEvents.PlayerReady:FireServer()
 
-        -- Get RemoteEvents
-        local Shared = ReplicatedStorage:WaitForChild("Shared")
-        local RemoteEvents = require(Shared:WaitForChild("RemoteEvents"))
+    -- Start the top-down camera controller
+    CameraController.start()
 
-        -- Signal server that player is ready
-        RemoteEvents.PlayerReady:FireServer()
-
-        -- Start the top-down camera controller (this will handle the camera)
-        CameraController.start()
-
-        -- Start the task system
-        task.spawn(function()
-            TaskManager.start()
-        end)
-
-        print("[Client Init] Switched to gameplay camera")
+    -- Start the task system
+    task.spawn(function()
+        TaskManager.start()
     end)
 end)
