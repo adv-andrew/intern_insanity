@@ -337,6 +337,14 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                     print("[TaskBehaviors] CutscenePart Position:", cutscenePart.CFrame.Position)
 
                     print("[TaskBehaviors] Switched camera to CutscenePart")
+
+                    -- Disable MainGui
+                    local playerGui = player:WaitForChild("PlayerGui")
+                    local mainGui = playerGui:FindFirstChild("MainGui")
+                    if mainGui then
+                        mainGui.Enabled = false
+                        print("[TaskBehaviors] Disabled MainGui")
+                    end
                 end)
                 print("[TaskBehaviors] Fade transition complete")
 
@@ -404,6 +412,14 @@ function TaskBehaviors.handleTalkToBossInteraction(objectPath: string, currentOb
                     print("[TaskBehaviors] CutscenePart Position:", cutscenePart.CFrame.Position)
 
                     print("[TaskBehaviors] Switched camera to CutscenePart")
+
+                    -- Disable MainGui
+                    local playerGui = player:WaitForChild("PlayerGui")
+                    local mainGui = playerGui:FindFirstChild("MainGui")
+                    if mainGui then
+                        mainGui.Enabled = false
+                        print("[TaskBehaviors] Disabled MainGui")
+                    end
                 end)
                 print("[TaskBehaviors] Fade transition complete")
 
